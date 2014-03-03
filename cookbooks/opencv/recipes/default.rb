@@ -33,6 +33,13 @@ end
 apt_package "libv4l-dev" do
   action :install
 end
+apt_package "python-numpy" do
+  action :install
+end
+
+apt_package "yum" do
+  action :install
+end
 
 remote_file "/home/vagrant/OpenCV-2.4.3.tar.bz2" do
   source "http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.3/OpenCV-2.4.3.tar.bz2"
@@ -55,11 +62,11 @@ directory "/home/vagrant/OpenCV-2.4.3/build" do
   action :create
 end
 # 
-bash "install_something" do
+bash "build_it" do
   user "root"
   cwd "/home/vagrant/OpenCV-2.4.3/build"
   code <<-EOH
-  cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_OPENGL=ON ..
+  cmake  -D CMAKE_BUILD_TYPE=RELEASE -D WITH_TBB=ON -D BUILD_opencv_python=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_DOCS=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_OPENGL=ON ..
   make
   make install
   EOH
