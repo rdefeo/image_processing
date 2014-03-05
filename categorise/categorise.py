@@ -12,7 +12,7 @@ from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
 from common import clock, mosaic
-SZ = 20 # size of each digit is SZ x SZ
+SZ = 100 # size of each digit is SZ x SZ
 
 shoeCategory = {
   "Boots": 0,
@@ -32,7 +32,6 @@ def load_shoes_directory(pn, category):
 def load_shoes(pn):
   print 'loading "%s" ...' % pn
   shoes, labels = [], []
-  # labelledImages = [load_shoes_directory(pn,d) 
   
   for d in listdir(pn):
     if not isfile(join(pn,d)) and len(listdir(join(pn,d))) > 100:
@@ -43,14 +42,11 @@ def load_shoes(pn):
   shoes = np.array(shoes)
   labels = np.array(labels)
   
-  for idx, val in enumerate(shoes):
-    cv2.imwrite("out/shoes/loaded/" + str(labels[idx]) + "_" + str(idx) + ".jpg", shoes[idx])
+  # for idx, val in enumerate(shoes):
+  #   cv2.imwrite("out/shoes/loaded/" + str(labels[idx]) + "_" + str(idx) + ".jpg", shoes[idx])
   return shoes, labels
-  # print shoes, labels
-  # digits_img = cv2.imread(fn, 0)
-  # digits = split2d(digits_img, (SZ, SZ))
-  # labels = np.repeat(np.arange(CLASS_N), len(digits)/CLASS_N)
-  # return digits, labels
+
+
 def deskew(img):
     m = cv2.moments(img)
     if abs(m['mu02']) < 1e-2:
