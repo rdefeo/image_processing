@@ -12,6 +12,8 @@ from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
 from common import clock, mosaic
+from models import KNearest, SVM
+
 SZ = 100 # size of each digit is SZ x SZ
 mosaic_SZ = 50
 
@@ -21,12 +23,17 @@ shoeCategory = {
   "Heels": 2,
   "Sandals": 3
 }
-
+def processImage(f):
+  # orig
+  
+  return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
+  
 def load_shoes_directory(pn, category):
-  print 'loading "%s" ...' % category
   # files = listdir(join(pn,category))[:500]
   files = listdir(join(pn,category))
-  images =  [cv2.resize(cv2.imread(join(pn,category,f), 0), (SZ,SZ)) for f in files if isfile(join(pn,category,f))]
+  print 'action=loading,categoryName=%s,itemCount=%d' % (category, len(files))
+  
+  images =  [processImage(join(pn,category,f)) for f in files if isfile(join(pn,category,f))]
   # images =  [join(pn,category,f) for f in listdir(join(pn,category))[:3] if isfile(join(pn,category,f))]
   # ss = images, np.repeat(category, len(images))
   # print ss(0)
@@ -59,61 +66,57 @@ def deskew(img):
     img = cv2.warpAffine(img, M, (SZ, SZ), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
     return img
 
+
+def preprocess_item(img):
+
+    gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+    gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+    mag, ang = cv2.cartToPolar(gx, gy)
+    bin_n = 16
+    bin = np.int32(bin_n*ang/(2*np.pi))
+    bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+    mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+    hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+    hist = np.hstack(hists)
+
+    # transform to Hellinger kernel
+    eps = 1e-7
+    hist /= hist.sum() + eps
+    hist = np.sqrt(hist)
+    hist /= norm(hist) + eps
+
+    return hist
+
 def preprocess_hog(digits):
-    samples = []
-    for img in digits:
-        gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
-        gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
-        mag, ang = cv2.cartToPolar(gx, gy)
-        bin_n = 16
-        bin = np.int32(bin_n*ang/(2*np.pi))
-        bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
-        mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
-        hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
-        hist = np.hstack(hists)
+  samples = []
+  for img in digits:
+    hist = preprocess_item(img)
+    samples.append(hist)
 
-        # transform to Hellinger kernel
-        eps = 1e-7
-        hist /= hist.sum() + eps
-        hist = np.sqrt(hist)
-        hist /= norm(hist) + eps
+  return np.float32(samples)
+    # samples = []
+    # for img in digits:
+    #     gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+    #     gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+    #     mag, ang = cv2.cartToPolar(gx, gy)
+    #     bin_n = 16
+    #     bin = np.int32(bin_n*ang/(2*np.pi))
+    #     bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+    #     mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+    #     hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+    #     hist = np.hstack(hists)
+    # 
+    #     # transform to Hellinger kernel
+    #     eps = 1e-7
+    #     hist /= hist.sum() + eps
+    #     hist = np.sqrt(hist)
+    #     hist /= norm(hist) + eps
+    # 
+    #     samples.append(hist)
+    # return np.float32(samples)
 
-        samples.append(hist)
-    return np.float32(samples)
 
 
-class StatModel(object):
-    def load(self, fn):
-        self.model.load(fn)
-    def save(self, fn):
-        self.model.save(fn)
-class KNearest(StatModel):
-    def __init__(self, k = 3):
-        self.k = k
-        self.model = cv2.KNearest()
-
-    def train(self, samples, responses):
-        self.model = cv2.KNearest()
-        self.model.train(samples, responses)
-
-    def predict(self, samples):
-        retval, results, neigh_resp, dists = self.model.find_nearest(samples, self.k)
-        return results.ravel()
-
-class SVM(StatModel):
-    def __init__(self, C = 1, gamma = 0.5):
-        self.params = dict( kernel_type = cv2.SVM_RBF,
-                            svm_type = cv2.SVM_C_SVC,
-                            C = C,
-                            gamma = gamma )
-        self.model = cv2.SVM()
-
-    def train(self, samples, responses):
-        self.model = cv2.SVM()
-        self.model.train(samples, responses, params = self.params)
-
-    def predict(self, samples):
-        return self.model.predict_all(samples).ravel()
 
 def evaluate_model(model, digits, samples, labels):
     resp = model.predict(samples)
@@ -136,7 +139,6 @@ def evaluate_model(model, digits, samples, labels):
     return mosaic(mosaic_SZ, vis)
         
 if __name__ == '__main__':
-
   print __doc__
   shoes, labels = load_shoes("../data/category/")
       
@@ -147,7 +149,7 @@ if __name__ == '__main__':
   shoes, labels = shoes[shuffle], labels[shuffle]
     
   print 'creating datasets...'
-  shoes = map(deskew, shoes)
+  # shoes = map(deskew, shoes)
   samples = preprocess_hog(shoes)
   
       
