@@ -101,6 +101,21 @@ class KNearest(StatModel):
         retval, results, neigh_resp, dists = self.model.find_nearest(samples, self.k)
         return results.ravel()
 
+class SVM(StatModel):
+    def __init__(self, C = 1, gamma = 0.5):
+        self.params = dict( kernel_type = cv2.SVM_RBF,
+                            svm_type = cv2.SVM_C_SVC,
+                            C = C,
+                            gamma = gamma )
+        self.model = cv2.SVM()
+
+    def train(self, samples, responses):
+        self.model = cv2.SVM()
+        self.model.train(samples, responses, params = self.params)
+
+    def predict(self, samples):
+        return self.model.predict_all(samples).ravel()
+
 def evaluate_model(model, digits, samples, labels):
     resp = model.predict(samples)
     err = (labels != resp).mean()
@@ -150,3 +165,11 @@ if __name__ == '__main__':
   model.train(samples_train, labels_train)
   vis = evaluate_model(model, shoes_test, samples_test, labels_test)
   cv2.imwrite('out/KNearest_test.jpg', vis)
+  
+  print 'training SVM...'
+  model = SVM(C=2.67, gamma=5.383)
+  model.train(samples_train, labels_train)
+  vis = evaluate_model(model, shoes_test, samples_test, labels_test)
+  cv2.imwrite('out/SVM_test.jpg', vis)
+  print 'saving SVM as "digits_svm.dat"...'
+  model.save('out/digits_svm.dat')
