@@ -12,7 +12,7 @@ from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
 from common import clock, mosaic, preprocess_hog, preprocess_item, shoeCategory
-from models import KNearest, SVM
+from models import KNearest, SVM, RTrees
 
 SZ = 100 # size of each digit is SZ x SZ
 mosaic_SZ = 50
@@ -126,3 +126,13 @@ if __name__ == '__main__':
   cv2.imwrite('out/SVM_test_' + str(SZ) + '.jpg', vis)
   print 'saving SVM as "shoes_svm_' + str(SZ) + '.dat"...'
   model.save('out/shoes_svm_' + str(SZ) + '.dat')
+  
+  print 'training RTrees...'
+  model = RTrees()
+  model.train(samples_train, labels_train)
+  vis = evaluate_model(model, shoes_test, samples_test, labels_test)
+  cv2.imwrite('out/RTrees_test_' + str(SZ) + '.jpg', vis)
+  print 'saving RTrees as "shoes_rtrees_' + str(SZ) + '.dat"...'
+  model.save('out/shoes_rtrees_' + str(SZ) + '.dat')
+  
+  

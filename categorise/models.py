@@ -1,33 +1,47 @@
 import cv2
-
-class LetterStatModel(object):
-    class_n = 26
-    train_ratio = 0.5
-
-    def load(self, fn):
-        self.model.load(fn)
-    def save(self, fn):
-        self.model.save(fn)
-
-    def unroll_samples(self, samples):
-        sample_n, var_n = samples.shape
-        new_samples = np.zeros((sample_n * self.class_n, var_n+1), np.float32)
-        new_samples[:,:-1] = np.repeat(samples, self.class_n, axis=0)
-        new_samples[:,-1] = np.tile(np.arange(self.class_n), sample_n)
-        return new_samples
-
-    def unroll_responses(self, responses):
-        sample_n = len(responses)
-        new_responses = np.zeros(sample_n*self.class_n, np.int32)
-        resp_idx = np.int32( responses + np.arange(sample_n)*self.class_n )
-        new_responses[resp_idx] = 1
-        return new_responses
-
+import numpy as np
+# class LetterStatModel(object):
+#     class_n = 26
+#     train_ratio = 0.5
+# 
+#     def load(self, fn):
+#         self.model.load(fn)
+#     def save(self, fn):
+#         self.model.save(fn)
+# 
+#     def unroll_samples(self, samples):
+#         sample_n, var_n = samples.shape
+#         new_samples = np.zeros((sample_n * self.class_n, var_n+1), np.float32)
+#         new_samples[:,:-1] = np.repeat(samples, self.class_n, axis=0)
+#         new_samples[:,-1] = np.tile(np.arange(self.class_n), sample_n)
+#         return new_samples
+# 
+#     def unroll_responses(self, responses):
+#         sample_n = len(responses)
+#         new_responses = np.zeros(sample_n*self.class_n, np.int32)
+#         resp_idx = np.int32( responses + np.arange(sample_n)*self.class_n )
+#         new_responses[resp_idx] = 1
+#         return new_responses
 class StatModel(object):
     def load(self, fn):
         self.model.load(fn)
     def save(self, fn):
         self.model.save(fn)
+
+
+class RTrees(StatModel):
+    def __init__(self):
+        self.model = cv2.RTrees()
+
+    def train(self, samples, responses):
+        sample_n, var_n = samples.shape
+        var_types = np.array([cv2.CV_VAR_NUMERICAL] * var_n + [cv2.CV_VAR_CATEGORICAL], np.uint8)
+        #CvRTParams(10,10,0,false,15,0,true,4,100,0.01f,CV_TERMCRIT_ITER));
+        params = dict(max_depth=10 )
+        self.model.train(samples, cv2.CV_ROW_SAMPLE, responses, varType = var_types, params = params)
+
+    def predict(self, samples):
+        return np.float32( [self.model.predict(s) for s in samples] )
 
 class KNearest(StatModel):
     def __init__(self, k = 3):
