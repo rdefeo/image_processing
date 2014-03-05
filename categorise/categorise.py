@@ -23,7 +23,7 @@ shoeCategory = {
 
 def load_shoes_directory(pn, category):
   print 'loading "%s" ...' % category
-  images =  [cv2.resize(cv2.imread(join(pn,category,f), 0), (SZ,SZ)) for f in listdir(join(pn,category))[:10] if isfile(join(pn,category,f))]
+  images =  [cv2.resize(cv2.imread(join(pn,category,f), 0), (SZ,SZ)) for f in listdir(join(pn,category))[:500] if isfile(join(pn,category,f))]
   # images =  [join(pn,category,f) for f in listdir(join(pn,category))[:3] if isfile(join(pn,category,f))]
   # ss = images, np.repeat(category, len(images))
   # print ss(0)
