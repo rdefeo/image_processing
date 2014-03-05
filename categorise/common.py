@@ -9,8 +9,50 @@ import cv2
 import os
 from contextlib import contextmanager
 import itertools as it
+from numpy.linalg import norm
 
 image_extensions = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.pbm', '.pgm', '.ppm']
+
+idCategory = [
+  "Boots",
+  "Flats",
+  "Heels",
+  "Sandals"
+]
+
+shoeCategory = {
+  "Boots": 0,
+  "Flats": 1,
+  "Heels": 2,
+  "Sandals": 3
+}
+def preprocess_item(img):
+
+    gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+    gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+    mag, ang = cv2.cartToPolar(gx, gy)
+    bin_n = 16
+    bin = np.int32(bin_n*ang/(2*np.pi))
+    bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+    mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+    hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+    hist = np.hstack(hists)
+
+    # transform to Hellinger kernel
+    eps = 1e-7
+    hist /= hist.sum() + eps
+    hist = np.sqrt(hist)
+    hist /= norm(hist) + eps
+
+    return hist
+
+def preprocess_hog(digits):
+  samples = []
+  for img in digits:
+    hist = preprocess_item(img)
+    samples.append(hist)
+
+  return np.float32(samples)
 
 class Bunch(object):
     def __init__(self, **kw):

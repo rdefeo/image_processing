@@ -69,4 +69,4 @@ class SVM(StatModel):
     def predict(self, samples):
         return self.model.predict_all(samples).ravel()
     def predictSingle(self, sample):
-        return self.model.predict(sample)
+        return int(self.model.predict(sample, True))
