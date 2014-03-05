@@ -13,6 +13,7 @@ from os.path import isfile, join
 from numpy.linalg import norm
 from common import clock, mosaic
 SZ = 100 # size of each digit is SZ x SZ
+mosaic_SZ = 50
 
 shoeCategory = {
   "Boots": 0,
@@ -23,7 +24,9 @@ shoeCategory = {
 
 def load_shoes_directory(pn, category):
   print 'loading "%s" ...' % category
-  images =  [cv2.resize(cv2.imread(join(pn,category,f), 0), (SZ,SZ)) for f in listdir(join(pn,category))[:500] if isfile(join(pn,category,f))]
+  # files = listdir(join(pn,category))[:500]
+  files = listdir(join(pn,category))
+  images =  [cv2.resize(cv2.imread(join(pn,category,f), 0), (SZ,SZ)) for f in files if isfile(join(pn,category,f))]
   # images =  [join(pn,category,f) for f in listdir(join(pn,category))[:3] if isfile(join(pn,category,f))]
   # ss = images, np.repeat(category, len(images))
   # print ss(0)
@@ -117,7 +120,7 @@ def evaluate_model(model, digits, samples, labels):
     err = (labels != resp).mean()
     print 'error: %.2f %%' % (err*100)
 
-    confusion = np.zeros((10, 10), np.int32)
+    confusion = np.zeros((len(shoeCategory), len(shoeCategory)), np.int32)
     for i, j in zip(labels, resp):
         confusion[i, j] += 1
     print 'confusion matrix:'
@@ -130,10 +133,10 @@ def evaluate_model(model, digits, samples, labels):
         if not flag:
             img[...,:2] = 0
         vis.append(img)
-    return mosaic(25, vis)
+    return mosaic(mosaic_SZ, vis)
         
 if __name__ == '__main__':
-  
+
   print __doc__
   shoes, labels = load_shoes("../data/category/")
       
@@ -160,12 +163,14 @@ if __name__ == '__main__':
   model = KNearest(k=4)
   model.train(samples_train, labels_train)
   vis = evaluate_model(model, shoes_test, samples_test, labels_test)
-  cv2.imwrite('out/KNearest_test.jpg', vis)
+  cv2.imwrite('out/KNearest_test_' + str(SZ) + '.jpg', vis)
+  # print 'saving KNearest as "shoes_svm_' + str(SZ) + '.dat"...'
+  # model.save('out/shoes_KNearest_' + str(SZ) + '.dat')
   
   print 'training SVM...'
   model = SVM(C=2.67, gamma=5.383)
   model.train(samples_train, labels_train)
   vis = evaluate_model(model, shoes_test, samples_test, labels_test)
-  cv2.imwrite('out/SVM_test.jpg', vis)
-  print 'saving SVM as "digits_svm.dat"...'
-  model.save('out/digits_svm.dat')
+  cv2.imwrite('out/SVM_test_' + str(SZ) + '.jpg', vis)
+  print 'saving SVM as "shoes_svm_' + str(SZ) + '.dat"...'
+  model.save('out/shoes_svm_' + str(SZ) + '.dat')
