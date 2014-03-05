@@ -11,11 +11,11 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
-from common import clock, mosaic, preprocess_hog, preprocess_item, shoeCategory
+from common import clock, mosaic, preprocess_hog, preprocess_item, shoeCategory, idCategory
 from models import KNearest, SVM, RTrees, Boost, MLP
 
-SZ = 100 # size of each digit is SZ x SZ
-mosaic_SZ = 100
+SZ = 250 # size of each digit is SZ x SZ
+mosaic_SZ = 50
 
 
 def processImage(f):
@@ -24,7 +24,7 @@ def processImage(f):
   return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
   
 def load_shoes_directory(pn, category):
-  # files = listdir(join(pn,category))[:500]
+  # files = listdir(join(pn,category))[:50]
   files = listdir(join(pn,category))
   print 'action=loading,categoryName=%s,itemCount=%d' % (category, len(files))
   
@@ -81,10 +81,11 @@ def evaluate_model(model, digits, samples, labels):
     print
 
     vis = []
-    for img, flag in zip(digits, resp == labels):
+    for img, guess, actual in zip(digits, resp, labels):
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
-        if not flag:
+        cv2.putText(img,"expected=" + idCategory[actual], (0,5), cv2.FONT_HERSHEY_SIMPLEX, 0.25, 255)
+        cv2.putText(img,"actual=" + idCategory[int(guess)], (0,15), cv2.FONT_HERSHEY_SIMPLEX, 0.25, 255)
+        if not guess == actual:
             img[...,:2] = 0
         vis.append(img)
     return mosaic(mosaic_SZ, vis)
