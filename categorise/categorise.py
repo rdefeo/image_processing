@@ -12,10 +12,10 @@ from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
 from common import clock, mosaic, preprocess_hog, preprocess_item, shoeCategory
-from models import KNearest, SVM, RTrees, Boost
+from models import KNearest, SVM, RTrees, Boost, MLP
 
 SZ = 100 # size of each digit is SZ x SZ
-mosaic_SZ = 50
+mosaic_SZ = 100
 
 
 def processImage(f):
@@ -83,6 +83,7 @@ def evaluate_model(model, digits, samples, labels):
     vis = []
     for img, flag in zip(digits, resp == labels):
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
         if not flag:
             img[...,:2] = 0
         vis.append(img)
@@ -142,5 +143,13 @@ if __name__ == '__main__':
   cv2.imwrite('out/boost_test_' + str(SZ) + '.jpg', vis)
   print 'saving Boost as "shoes_boost_' + str(SZ) + '.dat"...'
   model.save('out/shoes_boost_' + str(SZ) + '.dat')
+  
+  print 'training MLP...'
+  model = MLP()
+  model.train(samples_train, labels_train)
+  vis = evaluate_model(model, shoes_test, samples_test, labels_test)
+  cv2.imwrite('out/mlp_test_' + str(SZ) + '.jpg', vis)
+  print 'saving MLP as "shoes_mlp_' + str(SZ) + '.dat"...'
+  model.save('out/shoes_mlp_' + str(SZ) + '.dat')
   
   

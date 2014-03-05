@@ -43,6 +43,28 @@ class StatModel(object):
       new_responses[resp_idx] = 1
       return new_responses
 
+class MLP(StatModel):
+  def __init__(self):
+      self.model = cv2.ANN_MLP()
+
+  def train(self, samples, responses):
+      sample_n, var_n = samples.shape
+      new_responses = self.unroll_responses(responses).reshape(-1, self.class_n)
+
+      layer_sizes = np.int32([var_n, 100, 100, self.class_n])
+      self.model.create(layer_sizes)
+
+      # CvANN_MLP_TrainParams::BACKPROP,0.001
+      params = dict( term_crit = (cv2.TERM_CRITERIA_COUNT, 300, 0.01),
+                     train_method = cv2.ANN_MLP_TRAIN_PARAMS_BACKPROP,
+                     bp_dw_scale = 0.001,
+                     bp_moment_scale = 0.0 )
+      self.model.train(samples, np.float32(new_responses), None, params = params)
+
+  def predict(self, samples):
+      ret, resp = self.model.predict(samples)
+      return resp.argmax(-1)
+
 class Boost(StatModel):
     def __init__(self):
         self.model = cv2.Boost()

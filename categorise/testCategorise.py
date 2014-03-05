@@ -8,7 +8,7 @@ Usage:
 
 import numpy as np
 import cv2
-from models import KNearest, SVM, RTrees
+from models import KNearest, SVM, RTrees, Boost, MLP
 from common import preprocess_item, preprocess_hog, idCategory
 
 
@@ -20,9 +20,9 @@ if __name__ == '__main__':
     models = [
       RTrees, 
       KNearest, 
-      # Boost, 
+      Boost, 
       SVM, 
-      # MLP
+      MLP
     ] # NBayes
     models = dict( [(cls.__name__.lower(), cls) for cls in models] )   
 
