@@ -8,7 +8,7 @@ Usage:
 
 import numpy as np
 import cv2
-from models import KNearest, SVM
+from models import KNearest, SVM, RTrees
 from common import preprocess_item, preprocess_hog, idCategory
 
 
