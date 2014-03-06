@@ -51,16 +51,17 @@ def load_all_shoes():
             "$exists": True 
           }
         }
-      },
-      "shoe.categories": { 
-        "$in" : 
-          [
-            "Boots",
-            "Heels",
-            "Sandals",
-            "Flats"
-          ]                  
       }
+      
+      # "shoe.categories": { 
+      #   "$in" : 
+      #     [
+      #       "Boots",
+      #       "Heels",
+      #       "Sandals",
+      #       "Flats"
+      #     ]                  
+      # }
     },
     { 
       "shoe": 1      
@@ -69,11 +70,16 @@ def load_all_shoes():
   )
   for doc in docs:
     # cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
-    for image in doc["shoe"]["images"]:            
-      labels.append(shoeCategory[doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]])
-      f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
-      shoes.append(cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ)))
-
+    if len(doc["shoe"]["images"]) == 7:
+      for image in doc["shoe"]["images"]:    
+        if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
+          cat = doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]
+          if cat in ['Heels', "Flats", "Sandals", "Boots"]:
+            labels.append(shoeCategory[cat])
+            f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
+            shoes.append(processImage(f))
+  
+  print "datasetSize=%d" % (len(shoes))
   return np.array(shoes), np.array(labels)
   # print "/getter_data/images/" + str(docs[0]["shoe"]["images"][0]["_id"]) + contentTypeExtension[docs[0]["shoe"]["images"][0]["content-type"]]
   
