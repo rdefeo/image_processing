@@ -41,7 +41,7 @@ if __name__ == '__main__':
     
     # model.predict
 
-    testFile = cv2.imread('../data/category/Heels/2.jpg', cv2.CV_LOAD_IMAGE_GRAYSCALE)
+    testFile = cv2.imread(args['--input'], cv2.CV_LOAD_IMAGE_GRAYSCALE)
     testFile = cv2.resize(testFile, (args['--size'],args['--size']))
     # print testFile
     # d = model.predictSingle(testFile)

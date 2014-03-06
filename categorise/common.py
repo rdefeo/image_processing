@@ -14,17 +14,30 @@ from numpy.linalg import norm
 image_extensions = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.pbm', '.pgm', '.ppm']
 
 idCategory = [
-  "Boots",
-  "Flats",
   "Heels",
-  "Sandals"
+  "Shoes",
+  "Flats",
+  "Sandals",
+  "Boots",
+  "Loafers",
+  "Sneakers & Athletic Shoes",
+  "Clogs & Mules",
+  "Boat Shoes",
+  "Oxfords",
+  "Slippers"
 ]
-
 shoeCategory = {
-  "Boots": 0,
-  "Flats": 1,
-  "Heels": 2,
-  "Sandals": 3
+  "Heels": 0,
+  "Shoes": 1,
+  "Flats": 2,
+  "Sandals": 3,
+  "Boots": 4,
+  "Loafers": 5,
+  "Sneakers & Athletic Shoes": 6,
+  "Clogs & Mules": 7,
+  "Boat Shoes": 8,
+  "Oxfords": 9,
+  "Slippers": 10
 }
 def preprocess_item(img):
 

@@ -37,6 +37,12 @@ apt_package "python-numpy" do
   action :install
 end
 
+apt_package "python-pip" do
+  action :install
+end
+
+
+
 apt_package "yum" do
   action :install
 end

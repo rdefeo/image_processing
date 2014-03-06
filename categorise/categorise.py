@@ -13,10 +13,14 @@ from os.path import isfile, join
 from numpy.linalg import norm
 from common import clock, mosaic, preprocess_hog, preprocess_item, shoeCategory, idCategory
 from models import KNearest, SVM, RTrees, Boost, MLP
+from pymongo import MongoClient
 
-SZ = 250 # size of each digit is SZ x SZ
+SZ = 100 # size of each digit is SZ x SZ
 mosaic_SZ = 50
 
+contentTypeExtension = {
+  "image/jpeg": ".jpg"
+}
 
 def processImage(f):
   # orig
@@ -24,8 +28,8 @@ def processImage(f):
   return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
   
 def load_shoes_directory(pn, category):
-  # files = listdir(join(pn,category))[:50]
-  files = listdir(join(pn,category))
+  files = listdir(join(pn,category))[:500]
+  # files = listdir(join(pn,category))
   print 'action=loading,categoryName=%s,itemCount=%d' % (category, len(files))
   
   images =  [processImage(join(pn,category,f)) for f in files if isfile(join(pn,category,f))]
@@ -33,6 +37,49 @@ def load_shoes_directory(pn, category):
   # ss = images, np.repeat(category, len(images))
   # print ss(0)
   return images, np.repeat(shoeCategory[category], len(images))
+
+
+def load_all_shoes():
+  conn = MongoClient('mongodb://localhost')
+  db = conn.getter
+  shoes = []
+  labels = []
+  docs = db.shoes.find({ 
+      "shoe.images": { 
+        "$elemMatch" : {
+          "_id": { 
+            "$exists": True 
+          }
+        }
+      },
+      "shoe.categories": { 
+        "$in" : 
+          [
+            "Boots",
+            "Heels",
+            "Sandals",
+            "Flats"
+          ]                  
+      }
+    },
+    { 
+      "shoe": 1      
+       # ,"limit": 100
+    }
+  )
+  for doc in docs:
+    # cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
+    for image in doc["shoe"]["images"]:            
+      labels.append(shoeCategory[doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]])
+      f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
+      shoes.append(cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ)))
+
+  return np.array(shoes), np.array(labels)
+  # print "/getter_data/images/" + str(docs[0]["shoe"]["images"][0]["_id"]) + contentTypeExtension[docs[0]["shoe"]["images"][0]["content-type"]]
+  
+  # t = cv2.imread("/getter_data/images/" + str(docs[0]["shoe"]["images"][0]["_id"]) + contentTypeExtension[docs[0]["shoe"]["images"][0]["content-type"]], cv2.CV_LOAD_IMAGE_GRAYSCALE)
+  # print t
+  # cv2.imwrite("out/" + "test" + "_" + ".jpg", t)
   
 def load_shoes(pn):
   print 'loading "%s" ...' % pn
@@ -61,13 +108,6 @@ def deskew(img):
     img = cv2.warpAffine(img, M, (SZ, SZ), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
     return img
 
-
-
-
-
-
-
-
 def evaluate_model(model, digits, samples, labels):
     resp = model.predict(samples)
     err = (labels != resp).mean()
@@ -92,7 +132,11 @@ def evaluate_model(model, digits, samples, labels):
         
 if __name__ == '__main__':
   print __doc__
-  shoes, labels = load_shoes("../data/category/")
+  
+  shoes, labels = load_all_shoes()
+  
+  # shoes, labels = load_shoes("../data/category/")
+  
       
   print 'preprocessing...'
   # shuffle digits
