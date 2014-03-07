@@ -41,14 +41,35 @@ apt_package "python-pip" do
   action :install
 end
 
+apt_package "python-dev" do
+  action :install
+end
+
+apt_package "libqt4-dev" do
+  action :install
+end
+apt_package "libqt4-core" do
+  action :install
+end
+apt_package "libqt4-gui" do
+  action :install
+end
+apt_package "libqt4-xml" do
+  action :install
+end
+apt_package "libqt4-opengl" do
+  action :install
+end
+
 
 
 apt_package "yum" do
   action :install
 end
 
-remote_file "/home/vagrant/OpenCV-2.4.3.tar.bz2" do
-  source "http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.3/OpenCV-2.4.3.tar.bz2"
+remote_file "/home/vagrant/OpenCV-2.4.8.tar.bz2" do
+  # source "http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.8/OpenCV-2.4.8.tar.bz2"
+  source "https://github.com/Itseez/opencv/archive/2.4.8.tar.gz"
   # checksum node['nodejs']['checksum']
   mode 0644
   action :create_if_missing
@@ -58,10 +79,10 @@ end
 # # on NFS-mounted filesystem
 execute "tar -xvf OpenCV-2.4.*.tar.bz2" do
   cwd "/home/vagrant"
-  creates "/home/vagrant/OpenCV-2.4.3"
+  creates "/home/vagrant/opencv-2.4.8"
 end
 
-directory "/home/vagrant/OpenCV-2.4.3/build" do
+directory "/home/vagrant/opencv-2.4.8/build" do
   owner "vagrant"
   group "vagrant"
   mode 00755
@@ -70,9 +91,9 @@ end
 # 
 bash "build_it" do
   user "root"
-  cwd "/home/vagrant/OpenCV-2.4.3/build"
+  cwd "/home/vagrant/opencv-2.4.8/build"
   code <<-EOH
-  cmake -D CMAKE_INSTALL_PREFIX=/usr/local -D CMAKE_BUILD_TYPE=RELEASE -D WITH_TBB=ON -D BUILD_opencv_python=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_DOCS=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_OPENGL=ON ..
+  cmake -D CMAKE_INSTALL_PREFIX=/usr/local -D CMAKE_BUILD_TYPE=RELEASE -D WITH_TBB=ON -D BUILD_opencv_python=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_DOCS=ON -D BUILD_EXAMPLES=ON -D WITH_OPENGL=ON ..
   make
   make install
   EOH

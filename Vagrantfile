@@ -43,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # using a specific IP.
   # config.vm.network :private_network, ip: "192.168.33.10"
   
-  config.vm.network :private_network, ip: "192.168.0.4"
+  # config.vm.network :private_network, ip: "192.168.0.4"
   # The IP address of the host is always the same IP address but with the final octet as a 1. In the preceding example, the host machine would have the IP address 192.168.0.1.
 
   # Create a public network, which generally matched to bridged network.

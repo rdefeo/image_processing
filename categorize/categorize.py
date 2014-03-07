@@ -3,7 +3,7 @@
 '''
 
 Usage:
-   categorise.py
+   categorize.py
 '''
 
 import numpy as np
@@ -74,10 +74,10 @@ def load_all_shoes():
       for image in doc["shoe"]["images"]:    
         if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
           cat = doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]
-          if cat in ['Heels', "Flats", "Sandals", "Boots"]:
-            labels.append(shoeCategory[cat])
-            f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
-            shoes.append(processImage(f))
+          # if cat in ['Heels', "Flats", "Sandals", "Boots"]:
+          labels.append(shoeCategory[cat])
+          f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
+          shoes.append(processImage(f))
   
   print "datasetSize=%d" % (len(shoes))
   return np.array(shoes), np.array(labels)
@@ -135,32 +135,33 @@ def evaluate_model(model, digits, samples, labels):
             img[...,:2] = 0
         vis.append(img)
     return mosaic(mosaic_SZ, vis)
-        
-if __name__ == '__main__':
-  print __doc__
-  
-  shoes, labels = load_all_shoes()
-  
-  # shoes, labels = load_shoes("../data/category/")
-  
+
+def preprocessShoes():
+  shoes, labels = load_all_shoes()  
       
   print 'preprocessing...'
   # shuffle digits
   rand = np.random.RandomState(321)
   shuffle = rand.permutation(len(shoes))
   shoes, labels = shoes[shuffle], labels[shuffle]
-    
   print 'creating datasets...'
   # shoes = map(deskew, shoes)
   samples = preprocess_hog(shoes)
   
-      
+  return shoes, samples, labels
+        
+if __name__ == '__main__':
+  print __doc__
+  shoes, samples, labels = preprocessShoes()
+
   print 'creating mosaic...'
   train_n = int(0.9*len(samples))
-  cv2.imwrite('out/test_set.jpg', mosaic(10, shoes[train_n:]))
+
   shoes_train, shoes_test = np.split(shoes, [train_n])
   samples_train, samples_test = np.split(samples, [train_n])
   labels_train, labels_test = np.split(labels, [train_n])
+  cv2.imwrite('out/test_set.jpg', mosaic(10, shoes_test))
+  cv2.imwrite('out/train_set.jpg', mosaic(10, shoes_train))
   
   
   print 'training KNearest...'
