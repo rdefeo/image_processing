@@ -10,6 +10,7 @@ import os
 from contextlib import contextmanager
 import itertools as it
 from numpy.linalg import norm
+import pca
 
 image_extensions = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.pbm', '.pgm', '.ppm']
 
@@ -39,32 +40,139 @@ shoeCategory = {
   "Oxfords": 9,
   "Slippers": 10
 }
-def preprocess_item(img):
 
+# def autoCrop(img):
+#   # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#   topLeftX = len(img)
+#   topLeftY = len(img[0])
+#   bottomRightX = 0
+#   bottomRightY = 0
+# 
+#   for (y,x), value in np.ndenumerate(img):
+#     if img[y, x] != 255:
+#       if (x < topLeftX):      
+#         topLeftX = x
+#       if (y < topLeftY):
+#         topLeftY = y
+#     # else:
+#       if (x > bottomRightX):      
+#         bottomRightX = x
+#       if (y > bottomRightY):
+#         bottomRightY = y
+# 
+#   return img[topLeftY:bottomRightY, topLeftX:bottomRightX]
+
+def autoCrop(img):
+  img = img.swapaxes(1,0)
+  crop_img_rotated = []
+  for row in img:
+    if len(np.where(row!=255)[0]) > 0:
+      crop_img_rotated.append(row)
+
+  img = np.array(crop_img_rotated).swapaxes(1,0)
+  crop_img = []
+  for row in img:
+    if len(np.where(row!=255)[0]) > 0:
+      crop_img.append(row)
+
+  return np.array(crop_img)
+
+def preprocess_item_hist(img):
     gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
     gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
     mag, ang = cv2.cartToPolar(gx, gy)
+
     bin_n = 16
     bin = np.int32(bin_n*ang/(2*np.pi))
     bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
     mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
     hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
     hist = np.hstack(hists)
-
+    
     # transform to Hellinger kernel
     eps = 1e-7
     hist /= hist.sum() + eps
     hist = np.sqrt(hist)
     hist /= norm(hist) + eps
-
+    
+    # len(hist) = 64
+    # type(hist) = <type 'numpy.ndarray'>
+    # type(hist[0]) = <type 'numpy.float64'>
+    # hist[0] = 0.0
+    
+    # print hist 
+    # [ 0.          0.          0.          0.          0.          0.          0.
+    #   0.          0.          0.          0.          0.          0.          0.
+    #   0.          0.          0.02500444  0.03224029  0.0348727   0.05486763
+    #   0.05423923  0.05318612  0.09491311  0.13133056  0.07284845  0.0518625
+    #   0.04501667  0.08354647  0.07588132  0.03017876  0.0360361   0.0199627   0.
+    #   0.          0.          0.          0.          0.          0.          0.
+    #   0.          0.          0.          0.          0.          0.          0.
+    #   0.          0.21109739  0.23844386  0.2609863   0.28829302  0.29204482
+    #   0.23182723  0.18321263  0.20312054  0.18725011  0.26777668  0.24209061
+    #   0.25903133  0.27651589  0.25722604  0.23205954  0.20312469]
     return hist
+def preprocess_item_surf(img, surf):
+    detector = cv2.SURF(400)
 
-def preprocess_hog(digits):
+    surfKeyPoints, descriptors = detector.detectAndCompute(img,None)
+
+    # print 'descriptos len %s ' % len(descriptors)
+
+    # print len(descriptors.flatten())
+    # print descriptors[0]
+
+    # descriptors = descriptors.flatten()
+    mean, eigenvectors = cv2.PCACompute(descriptors, maxComponents=1)
+    if len(eigenvectors) != 1:
+      print "shit!"
+    return eigenvectors.flatten()
+
+    # surfKeyPoints, descriptors = surf.detectAndCompute(img,None)
+    # 
+    # 
+    # descriptors = descriptors.flatten()
+    # mean, eigenvectors = cv2.PCACompute(descriptors, maxComponents=50)[:50]
+    # descriptors = np.array([np.dot(eigenvectors,f-mean) for f in descriptors])
+    # print descriptors
+    # return descriptors.flatten()
+    # return hrows.flatten()
+    
+def preprocess_item_dsift(img, size=20,steps=10):
+  m,n = 100, 100
+  
+  scale = size/3.0
+  x,y = np.meshgrid(range(steps,m,steps),range(steps,n,steps))
+  xx,yy = x.flatten(),y.flatten()
+  frame = np.array([xx,yy,scale*np.ones(xx.shape[0]),np.zeros(xx.shape[0])])    
+  print frame.flatten()[0]
+  print frame.flatten()[1]
+  return frame.flatten()
+
+def preprocess_item_sift(img, sift):
+  
+  
+  keyPoints, descriptors = sift.detectAndCompute(img,None)
+  
+  print cv2.PCACompute(keyPoints, maxComponents=2)
+  # V,S,m = pca.pca(keyPoints)
+  
+  print V
+    
+def preprocess_hog(items):
+  
+  surf = cv2.SURF(400)
+  sift = cv2.SIFT(100)
   samples = []
-  for img in digits:
-    hist = preprocess_item(img)
+  for img in items:
+    # hist = preprocess_item_surf(img, surf)
+    hist = preprocess_item_hist(img)
+    # hist = preprocess_item_dsift(img)
+    # hist = preprocess_item_sift(img, sift)
+    
     samples.append(hist)
 
+  # return samples
   return np.float32(samples)
 
 class Bunch(object):
