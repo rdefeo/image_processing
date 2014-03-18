@@ -23,22 +23,11 @@ contentTypeExtension = {
 }
 
 def processImage(f):
-  # print 'action=processing,file=%s' % (f)
-  
-  
-  # gray = cv2.resize(cv2.imread(f, cv2.COLOR_BGR2GRAY), (SZ,SZ))
-  # blur = cv2.GaussianBlur(gray,(5,5),2 )
-  # thresh = cv2.adaptiveThreshold(blur,255,1,1,11,1)
-  # blur_thresh = cv2.GaussianBlur(thresh,(5,5),5)
-  # return blur_thresh
-  # gray = cv2.imread(f, cv2.COLOR_BGR2GRAY)
-  # blur = cv2.GaussianBlur(gray,(5,5),2 )
-  # flag, thresh = cv2.threshold(blur, 120, 255, cv2.THRESH_BINARY)
-  # flag, thresh = cv2.threshold(cv2.GaussianBlur(cv2.resize(cv2.imread(f, cv2.COLOR_BGR2GRAY), (SZ,SZ)),(1,1),1000), 120, 255, cv2.THRESH_BINARY)
-  # return thresh
+
   # return cv2.resize(thresh, (SZ,SZ))
   # return cv2.adaptiveThreshold(cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ)),255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
   return cv2.resize(autoCrop(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)), (SZ,SZ))
+  # return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
 
 def load_all_shoes():
   conn = MongoClient('mongodb://localhost')
@@ -58,20 +47,28 @@ def load_all_shoes():
     { 
       "shoe": 1
     }    
-  ).limit(4000)
+  )
+  # .limit(3000)
+  fs = []
   for doc in docs:
+    
     # cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
     if len(doc["shoe"]["images"]) == 7:
       for image in doc["shoe"]["images"]:    
         if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
-          cat = doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]
-          # if cat in ['Heels', "Flats", "Sandals", "Boots"]:
-          # print doc["_id"]["_id"];
-          # try:
-          f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
-          shoes.append(processImage(f))
-          labels.append(shoeCategory[cat])
-          ids.append(image["_id"])
+          fs.append({
+            "f": "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]],
+            "cat": doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]  ,
+            "image_id": image["_id"]        
+          })
+          
+  for i in fs:
+    
+          # cat = doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]          
+          # f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
+    shoes.append(processImage(i["f"]))
+    labels.append(shoeCategory[i["cat"]])
+    ids.append(i["image_id"])
           # except Exception, e:
           #             print 'action=processingFile,_id=%s,file=%s,error=%s' % (doc["_id"]["_id"], f, e)
           #             raise e
