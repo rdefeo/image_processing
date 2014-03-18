@@ -49,7 +49,7 @@ if __name__ == '__main__':
         "shoe.categories": 1,
         "shoe.images": 1
       }    
-    ).limit(10)
+    ).limit(400)
   
   f = open('data/bg.txt','w')
   

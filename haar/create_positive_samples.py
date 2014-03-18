@@ -24,7 +24,7 @@ contentTypeExtension = {
 if __name__ == '__main__':
   print __doc__
 
-  limit = 28
+  limit = 60
   conn = MongoClient('mongodb://localhost')
   db = conn.getter
   shoes = []

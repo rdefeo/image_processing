@@ -360,6 +360,7 @@ def mosaic(w, imgs):
     w    -- number of grid columns
     imgs -- images (must have same size and format)
     '''
+    
     imgs = iter(imgs)
     img0 = imgs.next()
     pad = np.zeros_like(img0)
