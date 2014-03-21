@@ -3,7 +3,7 @@
 '''
 
 Usage:
-   categorize.py
+   ./categorize.py --shoe-limit=2000 --image-size=100
 '''
 
 import numpy as np
@@ -17,6 +17,7 @@ from pymongo import MongoClient
 
 SZ = 100 # size of each digit is SZ x SZ
 mosaic_SZ = 50
+shoe_limit = 2000
 
 contentTypeExtension = {
   "image/jpeg": ".jpg"
@@ -27,7 +28,7 @@ def processImage(f):
   # return cv2.resize(thresh, (SZ,SZ))
   # return cv2.adaptiveThreshold(cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ)),255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
   return cv2.resize(autoCrop(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)), (SZ,SZ))
-  # return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
+   # return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
 
 def load_all_shoes():
   conn = MongoClient('mongodb://localhost')
@@ -47,8 +48,7 @@ def load_all_shoes():
     { 
       "shoe": 1
     }    
-  )
-  # .limit(3000)
+  ).limit(shoe_limit)
   fs = []
   for doc in docs:
     
@@ -56,16 +56,23 @@ def load_all_shoes():
     if len(doc["shoe"]["images"]) == 7:
       for image in doc["shoe"]["images"]:    
         if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
-          fs.append({
-            "f": "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]],
-            "cat": doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]  ,
-            "image_id": image["_id"]        
-          })
+          try:
+            fs.append({
+              "f": "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]],
+              "cat": doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]  ,
+              "image_id": image["_id"]        
+            })
+          except:
+            print doc["_id"]["_id"]
           
+  counter = 0;        
   for i in fs:
     
           # cat = doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]          
           # f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
+
+    print "Processing file [%d / %d] \r" % (counter, len(fs))
+    counter += 1
     shoes.append(processImage(i["f"]))
     labels.append(shoeCategory[i["cat"]])
     ids.append(i["image_id"])
@@ -127,7 +134,19 @@ def preprocessShoes():
 
         
 if __name__ == '__main__':
+  import getopt
+  import sys
+
   print __doc__
+
+  args, _ = getopt.getopt(sys.argv[1:], '', ['image-size=', 'shoe-limit='])
+  args = dict(args)
+  args.setdefault('--image-size', '100')
+  args.setdefault('--shoe-limit', '2000')
+  
+  SZ = int(args['--image-size'])
+  shoe_limit = int(args['--shoe-limit'])
+  
   shoes, samples, labels = preprocessShoes()
 
   print 'creating mosaic...'

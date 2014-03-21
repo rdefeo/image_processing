@@ -50,7 +50,7 @@ if __name__ == '__main__':
         "shoe.images": 1
       }    
     ).limit(25)
-  
+    
   f = open('data/info_' + str(limit) + '.dat','w')
   counter = 0
   for doc in docs:
