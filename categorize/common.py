@@ -25,7 +25,9 @@ idCategory = [
   "Clogs & Mules",
   "Boat Shoes",
   "Oxfords",
-  "Slippers"
+  "Slippers",
+  "Climbing",
+  "Sporting Goods"
 ]
 shoeCategory = {
   "Heels": 0,
@@ -38,29 +40,22 @@ shoeCategory = {
   "Clogs & Mules": 7,
   "Boat Shoes": 8,
   "Oxfords": 9,
-  "Slippers": 10
+  "Slippers": 10,
+  "Climbing": 11,
+  "Sporting Goods": 12
 }
 
-# def autoCrop(img):
-#   # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#   topLeftX = len(img)
-#   topLeftY = len(img[0])
-#   bottomRightX = 0
-#   bottomRightY = 0
-# 
-#   for (y,x), value in np.ndenumerate(img):
-#     if img[y, x] != 255:
-#       if (x < topLeftX):      
-#         topLeftX = x
-#       if (y < topLeftY):
-#         topLeftY = y
-#     # else:
-#       if (x > bottomRightX):      
-#         bottomRightX = x
-#       if (y > bottomRightY):
-#         bottomRightY = y
-# 
-#   return img[topLeftY:bottomRightY, topLeftX:bottomRightX]
+def processImage(f, auto_crop, size):
+  im = cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+  
+  if auto_crop:
+    im = autoCrop(im)
+  
+  return cv2.resize(im, (size,size))
+  # return cv2.adaptiveThreshold(cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ)),255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
+  # return cv2.resize(autoCrop(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)), (SZ,SZ))
+  # return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
+
 
 def autoCrop(img):
   img = img.swapaxes(1,0)

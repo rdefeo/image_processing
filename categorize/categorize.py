@@ -11,24 +11,19 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
-from common import autoCrop, clock, mosaic, preprocess_hog, preprocess_item_surf, shoeCategory, idCategory
+from common import processImage, autoCrop, clock, mosaic, preprocess_hog, preprocess_item_surf, shoeCategory, idCategory
 from models import KNearest, SVM, RTrees, Boost, MLP
 from pymongo import MongoClient
 
 SZ = 100 # size of each digit is SZ x SZ
 mosaic_SZ = 50
 shoe_limit = 2000
+auto_crop = True
 
 contentTypeExtension = {
   "image/jpeg": ".jpg"
 }
 
-def processImage(f):
-
-  # return cv2.resize(thresh, (SZ,SZ))
-  # return cv2.adaptiveThreshold(cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ)),255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-  return cv2.resize(autoCrop(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)), (SZ,SZ))
-   # return cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
 
 def load_all_shoes():
   conn = MongoClient('mongodb://localhost')
@@ -73,7 +68,7 @@ def load_all_shoes():
 
     print "Processing file [%d / %d] \r" % (counter, len(fs))
     counter += 1
-    shoes.append(processImage(i["f"]))
+    shoes.append(processImage(i["f"], auto_crop, SZ))
     labels.append(shoeCategory[i["cat"]])
     ids.append(i["image_id"])
           # except Exception, e:
@@ -134,18 +129,34 @@ def preprocessShoes():
 
         
 if __name__ == '__main__':
-  import getopt
-  import sys
-
-  print __doc__
-
-  args, _ = getopt.getopt(sys.argv[1:], '', ['image-size=', 'shoe-limit='])
-  args = dict(args)
-  args.setdefault('--image-size', '100')
-  args.setdefault('--shoe-limit', '2000')
+  from optparse import OptionParser
+  parser = OptionParser(usage="usage: %prog [options] filename",
+                            version="%prog 1.0")
   
-  SZ = int(args['--image-size'])
-  shoe_limit = int(args['--shoe-limit'])
+  parser.add_option("--ac", "--autocrop",
+                        action="store_true",
+                        dest="auto-crop",
+                        default=False,
+                        help="Auto crop the images")
+  parser.add_option("-s", "--image-size",
+                    action="store", # optional because action defaults to "store"
+                    dest="image-size",
+                    default="100",
+                    help="Size of final resized image")
+  parser.add_option("-l", "--shoe-limit",
+                    action="store", # optional because action defaults to "store"
+                    dest="shoe-limit",
+                    default="2000",
+                    help="Max number of shoes",)                    
+                    
+  (options, args) = parser.parse_args()       
+  option_dict = vars(options)
+
+
+  auto_crop = option_dict['auto-crop']          
+  SZ = int(option_dict['image-size'])
+  shoe_limit = int(option_dict['shoe-limit'])
+  # print __doc__
   
   shoes, samples, labels = preprocessShoes()
 

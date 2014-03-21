@@ -2,6 +2,20 @@
 
 ###Categorize Results
 
+using Zappos data across all their categories these are the results.
+
++ Categories
++ Heels
++ Shoes
++ Flats
++ Sandals
++ Boots
++ Loafers
++ Sneakers & Athletic Shoes
++ Clogs & Mules
++ Boat Shoes
++ Oxfords
++ Slippers
 
 <table>
   <tr>
@@ -112,6 +126,166 @@
     <td>21.23</td>
     <td>100</td>
     <td>Autocrop</td>
+  </tr>
+  <tr>
+    <td>6973</td>
+    <td>20.20</td>
+    <td>20.48</td>
+    <td>26.07</td>
+    <td>26.79</td>
+    <td>21.48</td>
+    <td>100</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td>6973</td>
+    <td>18.19</td>
+    <td>18.33</td>
+    <td>22.63</td>
+    <td>94.55</td>
+    <td>18.76</td>
+    <td>100</td>
+    <td>Autocrop</td>
+  </tr>
+  <tr>
+    <td>7971</td>
+    <td>21.05</td>
+    <td>20.30</td>
+    <td>24.56</td>
+    <td>26.94</td>
+    <td>19.04</td>
+    <td>100</td>
+    <td>None</td>
+  </tr>  
+  <tr>
+    <td>7971</td>
+    <td>17.54</td>
+    <td>17.42</td>
+    <td>21.80</td>
+    <td>27.19</td>
+    <td>18.42</td>
+    <td>100</td>
+    <td>Autocrop</td>
+  </tr>
+  <tr>
+    <td>8971</td>
+    <td>18.93</td>
+    <td>20.26</td>
+    <td>24.16</td>
+    <td>26.72</td>
+    <td>21.49</td>
+    <td>100</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td>8971</td>
+    <td>16.36</td>
+    <td>17.59</td>
+    <td>22.60</td>
+    <td>26.28</td>
+    <td>17.70</td>
+    <td>100</td>
+    <td>Autocrop</td>
+  </tr>
+  <tr>
+    <td>9967</td>
+    <td>18.95</td>
+    <td>19.15</td>
+    <td>23.26</td>
+    <td>85.75</td>
+    <td>19.85</td>
+    <td>100</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td>9967</td>
+    <td>16.54</td>
+    <td>15.44</td>
+    <td>21.16</td>
+    <td>25.67</td>
+    <td>18.15</td>
+    <td>100</td>
+    <td>Autocrop</td>
+  </tr>
+  <tr>
+    <td>10964</td>
+    <td>19.59</td>
+    <td>20.23</td>
+    <td>24.06</td>
+    <td>70.19</td>
+    <td>20.51</td>
+    <td>100</td>
+    <td>None</td>
+  </tr> 
+  <tr>
+    <td>10967</td>
+    <td>16.22</td>
+    <td>15.49</td>
+    <td>21.78</td>
+    <td>23.88</td>
+    <td>16.68</td>
+    <td>100</td>
+    <td>Autocrop</td>
+  </tr> 
+  <tr>
+    <td>11962</td>
+    <td>18.21</td>
+    <td>19.13</td>
+    <td>23.72</td>
+    <td>24.39</td>
+    <td>19.88</td>
+    <td>100</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td>11962</td>
+    <td>16.04</td>
+    <td>16.04</td>
+    <td>21.05</td>
+    <td>84.62</td>
+    <td>17.12</td>
+    <td>100</td>
+    <td>Autocrop</td>
+  </tr>
+  <tr>
+    <td>12960</td>
+    <td>18.75</td>
+    <td>19.14</td>
+    <td>25.0</td>
+    <td>24.92</td>
+    <td>19.67</td>
+    <td>100</td>
+    <td>None</td>
+  </tr>  
+  <tr>
+    <td>12960</td>
+    <td>15.97</td>
+    <td>16.35</td>
+    <td>22.53</td>
+    <td>87.96</td>
+    <td>16.04</td>
+    <td>100</td>
+    <td>Autocrop</td>
+  </tr>  
+  <tr>
+    <td>13960</td>
+    <td>19.69</td>
+    <td>20.48</td>
+    <td>25.35</td>
+    <td>25.71</td>
+    <td>21.48</td>
+    <td>100</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td>14957</td>
+    <td>19.91</td>
+    <td>20.32</td>
+    <td>25.80</td>
+    <td>74.93</td>
+    <td>21.45</td>
+    <td>100</td>
+    <td>None</td>
   </tr>
 </table>
 
