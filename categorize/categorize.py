@@ -3,7 +3,7 @@
 '''
 
 Usage:
-   ./categorize.py --shoe-limit=2000 --image-size=100 --database 'mongodb://localhost' --image_source /data/images
+   ./categorize.py --shoe-limit=2000 --image-size=100 --database 'mongodb://localhost' --image-source /data/images
 '''
 import sys
 sys.path.append('/usr/local/lib/python2.7/site-packages')
@@ -22,7 +22,7 @@ mosaic_SZ = 50
 shoe_limit = 2000
 auto_crop = False
 databaseUri = 'mongodb://localhost'
-getter_images_path = '/getter_data/images/'
+image_source = '/getter_data/images/'
 
 contentTypeExtension = {
   "image/jpeg": ".jpg"
@@ -57,7 +57,7 @@ def load_all_shoes():
         if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
           try:
             fs.append({
-              "f": getter_images_path + str(image["_id"]) + contentTypeExtension[image["content-type"]],
+              "f": image_source + str(image["_id"]) + contentTypeExtension[image["content-type"]],
               "cat": doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]  ,
               "image_id": image["_id"]        
             })
@@ -171,6 +171,7 @@ if __name__ == '__main__':
   SZ = int(option_dict['image-size'])
   shoe_limit = int(option_dict['shoe-limit'])
   databaseUri = option_dict['database']
+  image_source = option_dict['image_source']
   
   shoes, samples, labels = preprocessShoes()
 
