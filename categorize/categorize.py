@@ -3,7 +3,7 @@
 '''
 
 Usage:
-   ./categorize.py --shoe-limit=2000 --image-size=100
+   ./categorize.py --shoe-limit=2000 --image-size=100 --database 'mongodb://localhost'
 '''
 import sys
 sys.path.append('/usr/local/lib/python2.7/site-packages')
@@ -21,6 +21,7 @@ SZ = 100 # size of each digit is SZ x SZ
 mosaic_SZ = 50
 shoe_limit = 2000
 auto_crop = True
+databaseUri = 'mongodb://localhost'
 
 contentTypeExtension = {
   "image/jpeg": ".jpg"
@@ -28,7 +29,7 @@ contentTypeExtension = {
 
 
 def load_all_shoes():
-  conn = MongoClient('mongodb://localhost')
+  conn = MongoClient(databaseUri)
   db = conn.getter
   shoes = []
   labels = []
@@ -150,6 +151,12 @@ if __name__ == '__main__':
                     dest="shoe-limit",
                     default="2000",
                     help="Max number of shoes",)                    
+  parser.add_option("-d", "--database",
+                        action="store",
+                        dest="database",
+                        default='mongodb://localhost',
+                        help="Mongo database server address connnection string")
+  
                     
   (options, args) = parser.parse_args()       
   option_dict = vars(options)
@@ -158,6 +165,7 @@ if __name__ == '__main__':
   auto_crop = option_dict['auto-crop']          
   SZ = int(option_dict['image-size'])
   shoe_limit = int(option_dict['shoe-limit'])
+  database = option_dict['database']
   # print __doc__
   
   shoes, samples, labels = preprocessShoes()
