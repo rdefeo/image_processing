@@ -3,7 +3,7 @@
 '''
 
 Usage:
-   ./categorize.py --shoe-limit=2000 --image-size=100 --database 'mongodb://localhost'
+   ./categorize.py --shoe-limit=2000 --image-size=100 --database 'mongodb://localhost' --image_source /data/images
 '''
 import sys
 sys.path.append('/usr/local/lib/python2.7/site-packages')
@@ -20,8 +20,9 @@ from pymongo import MongoClient
 SZ = 100 # size of each digit is SZ x SZ
 mosaic_SZ = 50
 shoe_limit = 2000
-auto_crop = True
+auto_crop = False
 databaseUri = 'mongodb://localhost'
+getter_images_path = '/getter_data/images/'
 
 contentTypeExtension = {
   "image/jpeg": ".jpg"
@@ -56,7 +57,7 @@ def load_all_shoes():
         if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
           try:
             fs.append({
-              "f": "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]],
+              "f": getter_images_path + str(image["_id"]) + contentTypeExtension[image["content-type"]],
               "cat": doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]  ,
               "image_id": image["_id"]        
             })
@@ -156,7 +157,11 @@ if __name__ == '__main__':
                         dest="database",
                         default='mongodb://localhost',
                         help="Mongo database server address connnection string")
-  
+  parser.add_option("-d", "--image-source",
+                        action="store",
+                        dest="image_source",
+                        default='/getter_data/images/',
+                        help="source directory of where the images are")  
                     
   (options, args) = parser.parse_args()       
   option_dict = vars(options)
@@ -166,7 +171,6 @@ if __name__ == '__main__':
   SZ = int(option_dict['image-size'])
   shoe_limit = int(option_dict['shoe-limit'])
   databaseUri = option_dict['database']
-  # print __doc__
   
   shoes, samples, labels = preprocessShoes()
 
