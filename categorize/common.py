@@ -10,7 +10,6 @@ import os
 from contextlib import contextmanager
 import itertools as it
 from numpy.linalg import norm
-import pca
 
 image_extensions = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.pbm', '.pgm', '.ppm']
 
