@@ -157,7 +157,7 @@ if __name__ == '__main__':
                         dest="database",
                         default='mongodb://localhost',
                         help="Mongo database server address connnection string")
-  parser.add_option("-d", "--image-source",
+  parser.add_option("-i", "--image-source",
                         action="store",
                         dest="image_source",
                         default='/getter_data/images/',
