@@ -5,6 +5,8 @@
 Usage:
    ./categorize.py --shoe-limit=2000 --image-size=100
 '''
+import sys
+sys.path.append('/usr/local/lib/python2.7/site-packages')
 
 import numpy as np
 import cv2
