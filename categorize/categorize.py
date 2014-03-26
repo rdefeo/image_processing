@@ -165,7 +165,7 @@ if __name__ == '__main__':
   auto_crop = option_dict['auto-crop']          
   SZ = int(option_dict['image-size'])
   shoe_limit = int(option_dict['shoe-limit'])
-  database = option_dict['database']
+  databaseUri = option_dict['database']
   # print __doc__
   
   shoes, samples, labels = preprocessShoes()
