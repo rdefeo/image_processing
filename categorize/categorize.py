@@ -50,8 +50,6 @@ def load_all_shoes():
   ).limit(shoe_limit)
   fs = []
   for doc in docs:
-    
-    # cv2.resize(cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE), (SZ,SZ))
     if len(doc["shoe"]["images"]) == 7:
       for image in doc["shoe"]["images"]:    
         if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
