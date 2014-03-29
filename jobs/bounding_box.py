@@ -5,7 +5,7 @@ Description:
   For images with no bounding box it updates it with the autocrop method
   
 Usage:
-   ./bounding_box.py --database 'mongodb://localhost' --image-source /data/images
+   ./bounding_box.py --limit 1 --database 'mongodb://localhost' --image-source /data/images
 '''
 import os, sys
 sys.path.append('/usr/local/lib/python2.7/site-packages')
@@ -61,6 +61,9 @@ if __name__ == '__main__':
          "$match": { 
             "shoe.images.features.key": {
               "$ne" : "shoe"
+            },
+            "shoe.images._id": { 
+              "$exists": True 
             }
          } 
       },
@@ -74,7 +77,7 @@ if __name__ == '__main__':
     print "action=create image feature shoe_id=%s,image._id=%s" % (doc["_id"]["_id"], image["_id"])
     f = image_source + str(image["_id"]) + common.contentTypeExtension[image["content-type"]]
     im = cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-    im, x, y, width, height = common.autoCrop(im)
+    im, x, y, width, height = autoCrop(im)
         
     db.shoes.update({
       "_id._id": doc["_id"]["_id"],
