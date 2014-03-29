@@ -11,6 +11,9 @@ from contextlib import contextmanager
 import itertools as it
 from numpy.linalg import norm
 
+contentTypeExtension = {
+  "image/jpeg": ".jpg"
+}
 image_extensions = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.pbm', '.pgm', '.ppm']
 
 idCategory = [

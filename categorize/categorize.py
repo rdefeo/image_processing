@@ -13,7 +13,7 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
-from common import processImage, autoCrop, clock, mosaic, preprocess_hog, preprocess_item_surf, shoeCategory, idCategory
+from common import processImage, autoCrop, clock, mosaic, preprocess_hog, preprocess_item_surf, shoeCategory, idCategory, contentTypeExtension
 from models import KNearest, SVM, RTrees, Boost, MLP
 from pymongo import MongoClient
 
@@ -24,9 +24,7 @@ auto_crop = False
 databaseUri = 'mongodb://localhost'
 image_source = '/getter_data/images/'
 
-contentTypeExtension = {
-  "image/jpeg": ".jpg"
-}
+
 
 
 def load_all_shoes():
