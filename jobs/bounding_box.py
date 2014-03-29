@@ -77,7 +77,7 @@ if __name__ == '__main__':
     print "action=create image feature shoe_id=%s,image._id=%s" % (doc["_id"]["_id"], image["_id"])
     f = image_source + str(image["_id"]) + common.contentTypeExtension[image["content-type"]]
     im = cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-    im, x, y, width, height = autoCrop(im)
+    im, x, y, width, height = common.autoCrop(im)
         
     db.shoes.update({
       "_id._id": doc["_id"]["_id"],
