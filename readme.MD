@@ -9,6 +9,12 @@ import sys
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 ````
 
+###Usage
+
 + install `sudo python setup.py install` from project directory
 + import `from improc.crop import AutoCrop`
 + use `AutoCrop(img)`
+
+###Tests
++ `python -m unittest discover`
++ 
