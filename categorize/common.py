@@ -56,41 +56,6 @@ def processImage(f, auto_crop, size):
   return cv2.resize(im, (size,size))
 
 
-def autoCrop(img):
-  img = img.swapaxes(1,0)
-  crop_img_rotated = []
-  xfound = False
-  # want to have a sligher before
-  counterx = -1
-  # want to have a sligher before and after
-  counterw = 2
-  for row in img:
-    if len(np.where(row!=255)[0]) > 0:
-      xfound = True
-      counterw +=1
-      crop_img_rotated.append(row)
-    if not xfound:
-      counterx +=1
-
-  
-  yfound = False
-  # want to have a sligher before
-  countery = -1
-  # want to have a sligher before and after
-  counterh = 2
-  
-  img = np.array(crop_img_rotated).swapaxes(1,0)
-  crop_img = []
-  for row in img:
-    if len(np.where(row!=255)[0]) > 0:
-      yfound = True
-      counterh +=1
-      crop_img.append(row)
-    if not yfound:
-      countery +=1
-
-  return np.array(crop_img), counterx, countery, counterw, counterh
-
 
 def preprocess_item_hist(img):
     gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
