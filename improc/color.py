@@ -53,10 +53,7 @@ def Matrix(img):
   df = DataFrame(dict(id=color_ids, data=np.ones(len(filtered_image)).tolist()))
 
   grouped = df.groupby('id')['data']
-  # print grouped.sum().percent()
-  # maximum = float(grouped.sum().max())
-  # minimum = float(grouped.sum().min())
-  minimum = 0 # ensure no vales end up as 0
+
   matrix = []
   for name, group in grouped:
     percent = float(group.sum() / len(filtered_image))
