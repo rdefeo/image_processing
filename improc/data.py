@@ -1,53 +1,61 @@
+import pymongo
+
 from settings import MONGODB_GETTER_SERVER, MONGODB_GETTER_PORT, MONGODB_GETTER_DB, MONGODB_GETTER_COLLECTION
 
-def DataExtractor(object):
+class DataExtractor(object):
   server = None
   port = None
   db = None
-  collection = None
+  collection_name = None
   query_data = {}
   limit = None
 
   def connect(self):
     connection = pymongo.Connection(self.server, self.port)
-    db = connection[self.db
-    self.collection = db[self.collection]
+    db = connection[self.db]
+    self.collection = db[self.collection_name]
 
   # def __init__(self, C = 1, gamma = 0.5):
   #   pass
 
   def execute(self):
-    self.build()
-    docs = None
-
-    docs = collection.find(
-      query_data,
+    print self.query_data
+    query = self.collection.find(
+      self.query_data,
       # {
       #   "shoe": 1
       # }
-    ).limit(self.limit)
+    )
+    if self.limit:
+      query = query.limit(self.limit)
+
+    docs = []
+
+    for x in query:
+      docs.append(x)
 
     return docs
 
 
 
-def GetterExtractor(DataExtractor):
+class GetterExtractor(DataExtractor):
 
   def __init__(self, server = MONGODB_GETTER_SERVER, port = MONGODB_GETTER_PORT, db = MONGODB_GETTER_DB, collection = MONGODB_GETTER_COLLECTION):
     self.server = server
     self.port = port
     self.db = db
-    self.collection = collection
-    self.xconnect()
+    self.collection_name = collection
+    self.connect()
 
-  def query(self, _id = None, header = None, detail = None):
-    query_data = {}
-
+  def query(self, _id = None, header = None, detail = None, limit = None):
+    self.limit = limit
     if not header == None:
-      query_data["header"] = header
+      # self.query_data["header"] = {}
+      for x in header.keys():
+        self.query_data["header.%s" % x] = header[x]
     if not detail == None:
-      query_data["detail"] = detail
-    if not _id == None
-      query_data["_id"] = _id
+      self.query_data["detail"] = detail
+    if not _id == None:
+      self.query_data["_id"] = _id
 
-    self.execute()
+    return self.execute()
