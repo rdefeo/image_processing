@@ -16,11 +16,11 @@ def DataExtractor(object):
   # def __init__(self, C = 1, gamma = 0.5):
   #   pass
 
-  def query(self):
+  def execute(self):
     self.build()
     docs = None
 
-    docs = db.shoes.find(
+    docs = collection.find(
       query_data,
       # {
       #   "shoe": 1
@@ -29,9 +29,9 @@ def DataExtractor(object):
 
     return docs
 
+  
 
 def GetterExtractor(DataExtractor):
-  query_header = {}
 
   def __init__(self, server = MONGODB_GETTER_SERVER, port = MONGODB_GETTER_PORT, db = MONGODB_GETTER_DB, collection = MONGODB_GETTER_COLLECTION):
     self.server = server
@@ -40,8 +40,12 @@ def GetterExtractor(DataExtractor):
     self.collection = collection
     self.xconnect()
 
-  def build(self):
+  def query(self, header = None, detail = None):
     query_data = {}
 
-    if len(query_header.keys())
-      query_data["header"] = query_header
+    if not header == None:
+      query_data["header"] = header
+    if not detail == None:
+      query_data["detail"] = detail
+
+    self.execute()
