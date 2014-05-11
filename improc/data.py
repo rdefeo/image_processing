@@ -29,7 +29,7 @@ def DataExtractor(object):
 
     return docs
 
-  
+
 
 def GetterExtractor(DataExtractor):
 
@@ -40,12 +40,14 @@ def GetterExtractor(DataExtractor):
     self.collection = collection
     self.xconnect()
 
-  def query(self, header = None, detail = None):
+  def query(self, _id = None, header = None, detail = None):
     query_data = {}
 
     if not header == None:
       query_data["header"] = header
     if not detail == None:
       query_data["detail"] = detail
+    if not _id == None
+      query_data["_id"] = _id
 
     self.execute()
