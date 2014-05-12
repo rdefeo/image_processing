@@ -54,3 +54,12 @@ class CosineComparator(DistanceComparator):
     d = scipy.spatial.distance.cosine(sampleA, sampleB)
 
     return d
+
+class HammingComparator(DistanceComparator):
+  def __init__(self):
+    self.name = "Hamming"
+
+  def compare(self, sampleA, sampleB):
+    d = scipy.spatial.distance.hamming(sampleA, sampleB)
+
+    return d
