@@ -45,3 +45,12 @@ class ChebyshevComparator(DistanceComparator):
     d = scipy.spatial.distance.chebyshev(sampleA, sampleB)
 
     return d
+
+class CosineComparator(DistanceComparator):
+  def __init__(self):
+    self.name = "Cosine"
+
+  def compare(self, sampleA, sampleB):
+    d = scipy.spatial.distance.cosine(sampleA, sampleB)
+
+    return d
