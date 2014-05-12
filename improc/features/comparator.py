@@ -36,3 +36,12 @@ class ManhattanComparator(DistanceComparator):
     d = scipy.spatial.distance.cityblock(sampleA, sampleB)
 
     return d
+
+class ChebyshevComparator(DistanceComparator):
+  def __init__(self):
+    self.name = "Chebyshev"
+
+  def compare(self, sampleA, sampleB):
+    d = scipy.spatial.distance.chebyshev(sampleA, sampleB)
+
+    return d
