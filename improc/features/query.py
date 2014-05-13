@@ -17,7 +17,7 @@ def do(sample, possibles, comparator):
   """
   results = []
   for x in possibles.keys():
-    distance = comparator.compare(sample, possibles[x])
+    distance = comparator.compare(sample["value"], possibles[x]["value"])
     res = {
       "value": distance,
       "key": x
