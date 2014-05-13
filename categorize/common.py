@@ -20,7 +20,7 @@ idCategory = [
   "Heels",
   "Shoes",
   "Flats",
-  "Sandals",
+  "sandals",
   "Boots",
   "Loafers",
   "Sneakers & Athletic Shoes",
@@ -49,10 +49,11 @@ shoeCategory = {
 
 def processImage(f, auto_crop, size):
   im = cv2.imread(f, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-  
+
   if auto_crop:
     im, x, y, h, w = autoCrop(im)
-  
+
+
   return cv2.resize(im, (size,size))
 
 
@@ -68,19 +69,19 @@ def preprocess_item_hist(img):
     mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
     hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
     hist = np.hstack(hists)
-    
+
     # transform to Hellinger kernel
     eps = 1e-7
     hist /= hist.sum() + eps
     hist = np.sqrt(hist)
     hist /= norm(hist) + eps
-    
+
     # len(hist) = 64
     # type(hist) = <type 'numpy.ndarray'>
     # type(hist[0]) = <type 'numpy.float64'>
     # hist[0] = 0.0
-    
-    # print hist 
+
+    # print hist
     # [ 0.          0.          0.          0.          0.          0.          0.
     #   0.          0.          0.          0.          0.          0.          0.
     #   0.          0.          0.02500444  0.03224029  0.0348727   0.05486763
@@ -109,38 +110,38 @@ def preprocess_item_surf(img, surf):
     return eigenvectors.flatten()
 
     # surfKeyPoints, descriptors = surf.detectAndCompute(img,None)
-    # 
-    # 
+    #
+    #
     # descriptors = descriptors.flatten()
     # mean, eigenvectors = cv2.PCACompute(descriptors, maxComponents=50)[:50]
     # descriptors = np.array([np.dot(eigenvectors,f-mean) for f in descriptors])
     # print descriptors
     # return descriptors.flatten()
     # return hrows.flatten()
-    
+
 def preprocess_item_dsift(img, size=20,steps=10):
   m,n = 100, 100
-  
+
   scale = size/3.0
   x,y = np.meshgrid(range(steps,m,steps),range(steps,n,steps))
   xx,yy = x.flatten(),y.flatten()
-  frame = np.array([xx,yy,scale*np.ones(xx.shape[0]),np.zeros(xx.shape[0])])    
+  frame = np.array([xx,yy,scale*np.ones(xx.shape[0]),np.zeros(xx.shape[0])])
   print frame.flatten()[0]
   print frame.flatten()[1]
   return frame.flatten()
 
 def preprocess_item_sift(img, sift):
-  
-  
+
+
   keyPoints, descriptors = sift.detectAndCompute(img,None)
-  
+
   print cv2.PCACompute(keyPoints, maxComponents=2)
   # V,S,m = pca.pca(keyPoints)
-  
+
   print V
-    
+
 def preprocess_hog(items):
-  
+
   surf = cv2.SURF(400)
   sift = cv2.SIFT(100)
   samples = []
@@ -149,7 +150,7 @@ def preprocess_hog(items):
     hist = preprocess_item_hist(img)
     # hist = preprocess_item_dsift(img)
     # hist = preprocess_item_sift(img, sift)
-    
+
     samples.append(hist)
 
   # return samples
@@ -340,7 +341,6 @@ def mosaic(w, imgs):
     w    -- number of grid columns
     imgs -- images (must have same size and format)
     '''
-    
     imgs = iter(imgs)
     img0 = imgs.next()
     pad = np.zeros_like(img0)

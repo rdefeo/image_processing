@@ -13,7 +13,7 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 from numpy.linalg import norm
-from common import processImage, autoCrop, clock, mosaic, preprocess_hog, preprocess_item_surf, shoeCategory, idCategory, contentTypeExtension
+from common import processImage, clock, mosaic, preprocess_hog, preprocess_item_surf, shoeCategory, idCategory, contentTypeExtension
 from models import KNearest, SVM, RTrees, Boost, MLP
 from pymongo import MongoClient
 
@@ -22,7 +22,7 @@ mosaic_SZ = 50
 shoe_limit = 2000
 auto_crop = False
 databaseUri = 'mongodb://localhost'
-image_source = '/getter_data/images/'
+image_source = None
 
 
 
@@ -33,50 +33,54 @@ def load_all_shoes():
   shoes = []
   labels = []
   ids = []
-  docs = db.shoes.find({ 
-      "shoe.images": { 
+  docs = db.items.find({
+      "detail.images": {
         "$elemMatch" : {
-          "_id": { 
-            "$exists": True 
+          "_id": {
+            "$exists": True
           }
         }
       }
     },
-    { 
-      "shoe": 1
-    }    
+    {
+      "detail": 1
+    }
   ).limit(shoe_limit)
   fs = []
   for doc in docs:
-    if len(doc["shoe"]["images"]) == 7:
-      for image in doc["shoe"]["images"]:    
+    if len(doc["detail"]["images"]) == 7:
+      for image in doc["detail"]["images"]:
         if 'z' in image and image["z"] == 90 and 'y' in image and image["y"] == 0:
+
+          info = {
+            "f": image_source + image["path"],
+            "cat": doc["detail"]["categories"][len(doc["detail"]["categories"]) - 1]  ,
+            "image_id": image["_id"]
+          }
           try:
-            fs.append({
-              "f": image_source + str(image["_id"]) + contentTypeExtension[image["content-type"]],
-              "cat": doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]  ,
-              "image_id": image["_id"]        
-            })
+            fs.append(info)
           except:
+            print info
             print doc["_id"]["_id"]
-          
-  counter = 0;        
+
+  counter = 0;
   for i in fs:
-    
-          # cat = doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]          
+
+          # cat = doc["shoe"]["categories"][len(doc["shoe"]["categories"]) - 1]
           # f = "/getter_data/images/" + str(image["_id"]) + contentTypeExtension[image["content-type"]]
 
     print "Processing file [%d / %d] \r" % (counter, len(fs))
     counter += 1
+    print i
     shoes.append(processImage(i["f"], auto_crop, SZ))
     labels.append(shoeCategory[i["cat"]])
     ids.append(i["image_id"])
           # except Exception, e:
           #             print 'action=processingFile,_id=%s,file=%s,error=%s' % (doc["_id"]["_id"], f, e)
           #             raise e
-          #           
-            
-  
+          #
+
+
   print "datasetSize=%d" % (len(shoes))
   return np.array(shoes), np.array(labels), np.array(ids)
 
@@ -113,8 +117,8 @@ def evaluate_model(model, items, samples, labels):
     return mosaic(mosaic_SZ, vis), (err*100)
 
 def preprocessShoes():
-  shoes, labels, ids = load_all_shoes()  
-      
+  shoes, labels, ids = load_all_shoes()
+
   print 'preprocessing...'
   # shuffle digits
   rand = np.random.RandomState(321)
@@ -123,16 +127,16 @@ def preprocessShoes():
   print 'creating datasets...'
   # shoes = map(deskew, shoes)
   samples = preprocess_hog(shoes)
-  
+
   return shoes, samples, labels
 
 
-        
+
 if __name__ == '__main__':
   from optparse import OptionParser
   parser = OptionParser(usage="usage: %prog [options] filename",
                             version="%prog 1.0")
-  
+
   parser.add_option("--ac", "--autocrop",
                         action="store_true",
                         dest="auto-crop",
@@ -147,7 +151,7 @@ if __name__ == '__main__':
                     action="store", # optional because action defaults to "store"
                     dest="shoe-limit",
                     default="2000",
-                    help="Max number of shoes",)                    
+                    help="Max number of shoes",)
   parser.add_option("-d", "--database",
                         action="store",
                         dest="database",
@@ -156,19 +160,19 @@ if __name__ == '__main__':
   parser.add_option("-i", "--image-source",
                         action="store",
                         dest="image_source",
-                        default='/getter_data/images/',
-                        help="source directory of where the images are")  
-                    
-  (options, args) = parser.parse_args()       
+                        default='/Users/rdefeo/Development/getter/detail/data/images/',
+                        help="source directory of where the images are")
+
+  (options, args) = parser.parse_args()
   option_dict = vars(options)
 
 
-  auto_crop = option_dict['auto-crop']          
+  auto_crop = option_dict['auto-crop']
   SZ = int(option_dict['image-size'])
   shoe_limit = int(option_dict['shoe-limit'])
   databaseUri = option_dict['database']
   image_source = option_dict['image_source']
-  
+
   shoes, samples, labels = preprocessShoes()
 
   print 'creating mosaic...'
@@ -181,17 +185,17 @@ if __name__ == '__main__':
   for label in shoeCategory.values():
     images = [i for i, l in zip(shoes_test, labels_test) if (l == label)]
     if (len(images) > 0):
-      cv2.imwrite('out/test_' + idCategory[label]  + '_set.jpg', mosaic(20, images))      
-  
+      cv2.imwrite('out/test_' + idCategory[label]  + '_set.jpg', mosaic(20, images))
+
   for label in shoeCategory.values():
     images = [i for i, l in zip(shoes_test, labels_test) if (l == label)]
     if (len(images) > 0):
-      cv2.imwrite('out/test_' + idCategory[label]  + '_set.jpg', mosaic(20, images))      
- 
+      cv2.imwrite('out/test_' + idCategory[label]  + '_set.jpg', mosaic(20, images))
+
   cv2.imwrite('out/test_set.jpg', mosaic(20, shoes_test))
   cv2.imwrite('out/train_set.jpg', mosaic(20, shoes_train))
-  
-  
+
+
   print 'training KNearest...'
   model = KNearest(k=4)
   model.train(samples_train, labels_train)
@@ -199,7 +203,7 @@ if __name__ == '__main__':
   cv2.imwrite('out/KNearest_test_' + str(SZ) + '.jpg', vis)
   # print 'saving KNearest as "shoes_svm_' + str(SZ) + '.dat"...'
   # model.save('out/shoes_KNearest_' + str(SZ) + '.dat')
-  
+
   print 'training SVM...'
   model = SVM(C=2.67, gamma=5.383)
   model.train(samples_train, labels_train)
@@ -207,7 +211,7 @@ if __name__ == '__main__':
   cv2.imwrite('out/SVM_test_' + str(SZ) + '.jpg', vis)
   print 'saving SVM as "shoes_svm_' + str(SZ) + '.dat"...'
   model.save('out/shoes_svm_' + str(SZ) + '.dat')
-  
+
   print 'training RTrees...'
   model = RTrees()
   model.train(samples_train, labels_train)
@@ -215,7 +219,7 @@ if __name__ == '__main__':
   cv2.imwrite('out/rtrees_test_' + str(SZ) + '.jpg', vis)
   print 'saving RTrees as "shoes_rtrees_' + str(SZ) + '.dat"...'
   model.save('out/shoes_rtrees_' + str(SZ) + '.dat')
-  
+
   print 'training Boost...'
   model = Boost()
   model.train(samples_train, labels_train)
@@ -223,7 +227,7 @@ if __name__ == '__main__':
   cv2.imwrite('out/boost_test_' + str(SZ) + '.jpg', vis)
   print 'saving Boost as "shoes_boost_' + str(SZ) + '.dat"...'
   model.save('out/shoes_boost_' + str(SZ) + '.dat')
-  
+
   print 'training MLP...'
   model = MLP()
   model.train(samples_train, labels_train)
@@ -231,7 +235,5 @@ if __name__ == '__main__':
   cv2.imwrite('out/mlp_test_' + str(SZ) + '.jpg', vis)
   print 'saving MLP as "shoes_mlp_' + str(SZ) + '.dat"...'
   model.save('out/shoes_mlp_' + str(SZ) + '.dat')
-  
+
   print '%s,%s,%s,%s,%s,%s' % (len(shoes), knearestError, svmError, rtreesError, boostError, mlpError)
-  
-  

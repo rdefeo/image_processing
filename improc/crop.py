@@ -1,6 +1,14 @@
 import cv2
 import numpy as np
 from color import IsWhite
+import Image
+
+def Crop(img, x, y, width, height):
+  # box = (left, top, left+width, top+height)
+  # box = (x, y, x+width, y+height)
+  # return Image.fromarray(img).crop(box)
+  return img[y:y + height, x:x + width] # Crop from x, y, w, h -> 100, 200, 300, 400
+# NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
 
 def AutoCrop(img):
   img = img.swapaxes(1,0)
