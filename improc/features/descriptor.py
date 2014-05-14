@@ -1,13 +1,14 @@
 import mahotas.features
 import cv2
+import numpy as np
 
 class FeatureDescriptor(object):
   name = None
   properties = {}
 
   def create_spec(self, img):
-    spec = {
-      "shape": img.shape,
+    return {
+      "shape": list(img.shape),
       "name": self.name,
       "properties": self.properties
     }
@@ -18,26 +19,44 @@ class FeatureDescriptor(object):
     }
 
 class HarlickDescriptor(FeatureDescriptor):
-  def __init__(self, mean = 0):
+  def __init__(self, preprocess = False, mean = 0, size = (250, 250)):
     self.name = "harlick"
     self.properties["mean"] = mean
+    self.preprocess = preprocess
+
+  def do_preprocess(self, img):
+    x = np.copy(img)
+    return cv2.resize(x, self.properties["size"])
 
   def describe(self, img):
-    return self.create_result(img, mahotas.features.haralick(img).mean(self.properties["mean"]))
+    x = img
+    if self.preprocess:
+      x = self.do_preprocess(img)
+
+    return self.create_result(x, mahotas.features.haralick(x).mean(self.properties["mean"]))
 
 
 class RgbHistogramDescriptor(FeatureDescriptor):
-  def __init__(self, bins = [8, 8, 8]):
+  def __init__(self, preprocess = False, bins = [8, 8, 8], size = (250, 250)):
     self.name = "rgb_histogram"
     # store the number of bins the histogram will use
     self.properties["bins"] = bins
+    self.properties["size"] = size
+    self.preprocess = preprocess
+
+  def do_preprocess(self, img):
+    x = np.copy(img)
+    return cv2.resize(x, self.properties["size"])
 
   def describe(self, img):
+    x = img
+    if self.preprocess:
+      x = self.do_preprocess(img)
     # compute a 3D histogram in the RGB colorspace,
     # then normalize the histogram so that images
     # with the same content, but either scaled larger
     # or smaller will have (roughly) the same histogram
-    hist = cv2.calcHist([img], [0, 1, 2], None, self.properties["bins"], [0, 256, 0, 256, 0, 256])
+    hist = cv2.calcHist([x], [0, 1, 2], None, self.properties["bins"], [0, 256, 0, 256, 0, 256])
     hist = cv2.normalize(hist)
 
     # return out 3D histogram as a flattened array
@@ -45,16 +64,22 @@ class RgbHistogramDescriptor(FeatureDescriptor):
 
 
 class ZernikeDescriptor(FeatureDescriptor):
-  def __init__(self, radius = 21):
+  def __init__(self, preprocess = True, radius = 21, size = (250, 250)):
     self.name = "zernike"
     self.properties["radius"] = radius
+    self.preprocess = preprocess
+
+  def do_preprocess(self, img):
+    x = np.copy(img)
+    if len(img.shape) == 3:
+      x = cv2.cvtColor(x, cv2.COLOR_BGR2GRAY)
+
+    return cv2.resize(x, self.properties["size"])
 
   def describe(self, img):
-    processed_image = None
-    if len(img.shape) == 3:
-      processed_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-      processed_image = img
+    x = img
+    if self.preprocess:
+      x = self.do_preprocess(img)
 
-    value = mahotas.features.zernike_moments(processed_image, self.properties["radius"])
+    value = mahotas.features.zernike_moments(x, self.properties["radius"])
     return self.create_result(img, value)
