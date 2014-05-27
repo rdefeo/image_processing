@@ -12,33 +12,33 @@ def AutoCrop(img):
   xfound = False
   # want to have a sligher before
   counterx = -1
-  # want to have a sligher before and after
-  counterw = 2
+
   if IsWhite(img[0][0]) and IsWhite(img[len(img)-1][0]) and IsWhite(img[len(img)-1][len(img[0])-1]) and IsWhite(img[0][len(img[0])-1]):
     for row in img:
-      if len(np.where(row!=255)[0]) > 0:
+      non_white_pixels = [x for x in row if x[0] < 253 and x[1] < 253 and x[2] < 253]
+      if len(non_white_pixels) > 10:
         xfound = True
-        counterw +=1
         crop_img_rotated.append(row)
-      if not xfound:
-        counterx +=1
+
+      elif not xfound:
+        counterx += 1
 
     yfound = False
-    # want to have a sligher before
+    # want to have a sligther before
     countery = -1
-    # want to have a sligher before and after
-    counterh = 2
 
     img = np.array(crop_img_rotated).swapaxes(1,0)
     crop_img = []
     for row in img:
-      if len(np.where(row!=255)[0]) > 0:
+      non_white_pixels = [x for x in row if x[0] < 253 and x[1] < 253 and x[2] < 253]
+      if len(non_white_pixels) > 10:
         yfound = True
-        counterh +=1
         crop_img.append(row)
-      if not yfound:
-        countery +=1
+      elif not yfound:
+        countery += 1
 
-    return np.array(crop_img), counterx, countery, counterw, counterh
+    cropped =  np.array(crop_img)
+
+    return cropped, counterx, countery, cropped.shape[1] + 2, cropped.shape[0] + 2
   else:
     return None, None, None, None, None
