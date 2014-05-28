@@ -1,3 +1,5 @@
+![Alt text](https://www.codeship.io/projects/e9507f10-c840-0131-f8da-46db0ea8aa49/status)
+
 Just `vagrant up`
 
 then to get access to local mongo
@@ -17,4 +19,4 @@ sys.path.append('/usr/local/lib/python2.7/site-packages')
 
 ###Tests
 + `python -m unittest discover`
-+ 
++
