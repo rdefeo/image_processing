@@ -11,9 +11,9 @@ def Ratio(img):
   return float(img.shape[1]) / img.shape[0]
 
 def ScaleMax(img, width, height):
-  proposedHeight = float(height) / img.shape[0]
-  proposedWidth = float(width) / img.shape[1]
-  if proposedWidth > width:
+  r = float(height) / img.shape[0]
+  proposedWidth = int(img.shape[1] * r)
+  if proposedWidth > height:
     return ScaleWidth(img, width)
   else:
     return ScaleHeight(img, height)
