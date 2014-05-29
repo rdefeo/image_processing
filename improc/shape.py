@@ -11,8 +11,8 @@ def Ratio(img):
   return float(img.shape[1]) / img.shape[0]
 
 def ScaleMax(img, width, height):
-  proposedWidth = float(height) / img.shape[0]
-  proposedHeight = float(width) / img.shape[1]
+  proposedHeight = float(height) / img.shape[0]
+  proposedWidth = float(width) / img.shape[1]
   if proposedWidth > width:
     return ScaleWidth(img, width)
   else:
@@ -20,7 +20,7 @@ def ScaleMax(img, width, height):
 
 def ScaleHeight(img, height):
   r = float(height) / img.shape[0]
-  dim = (height, int(img.shape[1] * r))
+  dim = (int(img.shape[1] * r), height)
 
   # perform the actual resizing of the image and show it
   resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
@@ -29,7 +29,7 @@ def ScaleHeight(img, height):
 
 def ScaleWidth(img, width):
   r = float(width) / img.shape[1]
-  dim = (int(img.shape[0] * r), width)
+  dim = (width, int(img.shape[0] * r))
 
   # perform the actual resizing of the image and show it
   resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
