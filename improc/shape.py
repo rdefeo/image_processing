@@ -10,18 +10,28 @@ def Flatten(img):
 def Ratio(img):
   return float(img.shape[1]) / img.shape[0]
 
+def ScaleMax(img, width, height):
+  proposedWidth = float(height) / img.shape[0]
+  proposedHeight = float(width) / img.shape[1]
+  if proposedWidth > width:
+    return ScaleWidth(img, width)
+  else:
+    return ScaleHeight(img, height)
+
 def ScaleHeight(img, height):
   r = float(height) / img.shape[0]
-  dim = (int(img.shape[1] * r), height)
+  dim = (height, int(img.shape[1] * r))
 
   # perform the actual resizing of the image and show it
   resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+  print "action=ScaleWidth,width=%s,height=%s" % (resized.shape[1], resized.shape[0])
   return resized
 
 def ScaleWidth(img, width):
   r = float(width) / img.shape[1]
-  dim = (width, int(img.shape[0] * r))
+  dim = (int(img.shape[0] * r), width)
 
   # perform the actual resizing of the image and show it
   resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+  print "action=ScaleWidth,width=%s,height=%s" % (resized.shape[1], resized.shape[0])
   return resized
