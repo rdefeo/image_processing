@@ -41,7 +41,7 @@ def AutoCrop(img):
 
     if countery == -1 or counterx == -1:
       return cropped, counterx, countery, cropped.shape[1] + 2, cropped.shape[0] + 2
-    else
+    else:
       return None, None, None, None, None
   else:
     return None, None, None, None, None
