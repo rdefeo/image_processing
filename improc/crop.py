@@ -39,6 +39,9 @@ def AutoCrop(img):
 
     cropped =  np.array(crop_img)
 
-    return cropped, counterx, countery, cropped.shape[1] + 2, cropped.shape[0] + 2
+    if countery == -1 or counterx == -1:
+      return cropped, counterx, countery, cropped.shape[1] + 2, cropped.shape[0] + 2
+    else
+      return None, None, None, None, None
   else:
     return None, None, None, None, None
