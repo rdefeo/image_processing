@@ -41,6 +41,8 @@ def AutoCrop(img):
 
     if countery == -1 or counterx == -1:
       return None, None, None, None, None
+    elif not IsWhite(cropped[0][0]) and not IsWhite(cropped[len(cropped)-1][0]) and not IsWhite(cropped[len(cropped)-1][len(cropped[0])-1]) and not IsWhite(cropped[0][len(cropped[0])-1]):
+      return None, None, None, None, None
     else:
       return cropped, counterx, countery, cropped.shape[1] + 2, cropped.shape[0] + 2
 

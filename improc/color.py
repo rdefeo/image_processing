@@ -46,6 +46,9 @@ def Matrix(img):
   # img, x, y, h, w = AutoCrop(img)
   # reduced_color = Reduce(img, 5)
   background_image_color = Background(img)
+  if background_image_color == None:
+    return None
+  
   from shape import Flatten
   flattened_image = Flatten(img)
   filtered_image = [x for x in flattened_image.tolist() if x[0] != background_image_color[0] and x[1] != background_image_color[1] and x[2] != background_image_color[2]]
