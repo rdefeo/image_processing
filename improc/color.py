@@ -48,21 +48,25 @@ def Matrix(img):
   background_image_color = Background(img)
   if background_image_color == None:
     return None
-  
+
   from shape import Flatten
   flattened_image = Flatten(img)
   filtered_image = [x for x in flattened_image.tolist() if x[0] != background_image_color[0] and x[1] != background_image_color[1] and x[2] != background_image_color[2]]
   color_ids = [Hex(x[2], x[1], x[0]) for x in filtered_image]
-  df = DataFrame(dict(id=color_ids, data=np.ones(len(filtered_image)).tolist()))
-
-  grouped = df.groupby('id')['data']
+  grouped = {}
+  for x in color_ids:
+    if x in grouped:
+      grouped[x] += 1
+    else:
+      grouped[x] = 1
 
   matrix = []
-  for name, group in grouped:
-    percent = float(group.sum() / len(filtered_image))
+  for x in grouped.keys():
+    percent = float(grouped[x] / len(filtered_image))
     matrix.append({
       "hex": name,
       "percent": percent
     })
+
 
   return matrix
