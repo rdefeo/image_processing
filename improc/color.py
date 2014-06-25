@@ -63,7 +63,7 @@ def Matrix(img):
   for x in grouped.keys():
     percent = float(grouped[x] / len(filtered_image))
     matrix.append({
-      "hex": name,
+      "hex": x,
       "percent": percent
     })
 
