@@ -1,4 +1,3 @@
-from pandas import DataFrame
 import cv2
 
 import numpy as np
