@@ -1,6 +1,12 @@
 import mahotas.features
 import cv2
 import numpy as np
+import logging
+import time
+LOGGER = logging.getLogger(__name__)
+
+def ms(start):
+  return (time.time() - start) * 1000
 
 class FeatureDescriptor(object):
   name = None
@@ -29,11 +35,14 @@ class HarlickDescriptor(FeatureDescriptor):
     return cv2.resize(x, self.properties["size"])
 
   def describe(self, img):
+    start = time.time()
     x = img
     if self.preprocess:
       x = self.do_preprocess(img)
 
-    return self.create_result(x, mahotas.features.haralick(x).mean(self.properties["mean"]))
+    result = self.create_result(x, mahotas.features.haralick(x).mean(self.properties["mean"]))
+    LOGGER.info('ms=%s' % (ms(start)))
+    return result
 
 
 class RgbHistogramDescriptor(FeatureDescriptor):
@@ -49,6 +58,7 @@ class RgbHistogramDescriptor(FeatureDescriptor):
     return cv2.resize(x, self.properties["size"])
 
   def describe(self, img):
+    start = time.time()
     x = img
     if self.preprocess:
       x = self.do_preprocess(img)
@@ -60,7 +70,9 @@ class RgbHistogramDescriptor(FeatureDescriptor):
     hist = cv2.normalize(hist)
 
     # return out 3D histogram as a flattened array
-    return self.create_result(img, hist.flatten())
+    result = self.create_result(img, hist.flatten())
+    LOGGER.info('ms=%s' % (ms(start)))
+    return result
 
 
 class ZernikeDescriptor(FeatureDescriptor):
@@ -77,9 +89,12 @@ class ZernikeDescriptor(FeatureDescriptor):
     return cv2.resize(x, self.properties["size"])
 
   def describe(self, img):
+    start = time.time()
     x = img
     if self.preprocess:
       x = self.do_preprocess(img)
 
     value = mahotas.features.zernike_moments(x, self.properties["radius"])
-    return self.create_result(img, value)
+    result = self.create_result(img, value)
+    LOGGER.info('ms=%s' % (ms(start)))
+    return result

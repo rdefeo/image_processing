@@ -1,6 +1,14 @@
 import cv2
-
+import time
+import logging
 import numpy as np
+import logging
+import time
+
+LOGGER = logging.getLogger(__name__)
+
+def ms(start):
+  return (time.time() - start) * 1000
 
 def IsWhite(pixel):
   return pixel[0] == 255 and pixel[1] == 255 and pixel[2] == 255
@@ -14,6 +22,7 @@ def Background(img):
     return None
 
 def Reduce(img, number_of_colors):
+  start = time.time()
   """
   Reduce image to, number of colors supplied that are most relevant
   """
@@ -32,6 +41,7 @@ def Reduce(img, number_of_colors):
   res = center[label.flatten()]
   res2 = res.reshape((img.shape))
 
+  LOGGER.info('ms=%s' % (ms(start)))
   return res2
 
 def Hex(r, g, b):
@@ -42,6 +52,7 @@ def Matrix(img):
   Ignores the background image color, and returns a simplied break down of all
   the color information in the image, array of percentages
   """
+  start = time.time()
   # img, x, y, h, w = AutoCrop(img)
   # reduced_color = Reduce(img, 5)
   background_image_color = Background(img)
@@ -67,5 +78,5 @@ def Matrix(img):
       "percent": percent
     })
 
-
+  LOGGER.info('ms=%s' % (ms(start)))
   return matrix
