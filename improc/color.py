@@ -4,6 +4,7 @@ import logging
 import numpy as np
 import logging
 import time
+from itertools import groupby
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ def Reduce(img, number_of_colors):
   return res2
 
 def Hex(r, g, b):
-  return '#%02x%02x%02x' % (r, g, b)
+  return '0x%02x%02x%02x' % (r, g, b)
 
 def Matrix(img):
   """
@@ -53,28 +54,32 @@ def Matrix(img):
   the color information in the image, array of percentages
   """
   start = time.time()
-  # img, x, y, h, w = AutoCrop(img)
-  # reduced_color = Reduce(img, 5)
+
   background_image_color = Background(img)
   if background_image_color == None:
     return None
 
+  background_color_hex = Hex(background_image_color[2], background_image_color[1], background_image_color[0])
+
   from shape import Flatten
   flattened_image = Flatten(img)
-  filtered_image = [x for x in flattened_image.tolist() if x[0] != background_image_color[0] and x[1] != background_image_color[1] and x[2] != background_image_color[2]]
-  color_ids = [Hex(x[2], x[1], x[0]) for x in filtered_image]
-  grouped = {}
-  for x in color_ids:
-    if x in grouped:
-      grouped[x] += 1
-    else:
-      grouped[x] = 1
+
+  color_ids = np.array(
+        filter(
+          lambda x:x != background_color_hex,
+          map(
+            lambda x:Hex(x[2], x[1], x[0]),
+              flattened_image
+          )
+        )
+      )
+  color_ids.sort()
 
   matrix = []
-  for x in grouped.keys():
-    percent = float(grouped[x] / len(filtered_image))
+  for key, group in groupby(color_ids, lambda x: x):
+    percent = float(float(len(list(group))) / len(color_ids))
     matrix.append({
-      "hex": x,
+      "hex": key,
       "percent": percent
     })
 

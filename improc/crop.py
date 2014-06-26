@@ -14,6 +14,9 @@ def Crop(img, x, y, width, height):
 # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
 
 def AutoCrop(img):
+  """
+  returns x, y, width, height
+  """
   start = time.time()
   img = img.swapaxes(1,0)
   crop_img_rotated = []

@@ -18,5 +18,5 @@ sys.path.append('/usr/local/lib/python2.7/site-packages')
 + use `AutoCrop(img)`
 
 ###Tests
-+ `python -m unittest discover`
++ `python2.7 -m unittest discover`
 +
