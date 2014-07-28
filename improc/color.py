@@ -1,8 +1,6 @@
 import logging
-from itertools import groupby
 from time import time
 
-import cv2
 import numpy as np
 
 LOGGER = logging.getLogger(__name__)
@@ -16,122 +14,114 @@ def IsWhite(pixel):
     return pixel[0] == 255 and pixel[1] == 255 and pixel[2] == 255
 
 
-def Background(img):
-    if img[0][0][0] == img[len(img)-1][0][0] == img[len(img)-1][len(img[0])-1][0] == img[0][len(img[0])-1][0] \
-        and img[0][0][1] == img[len(img)-1][0][1] == img[len(img)-1][len(img[0])-1][1] == img[0][len(img[0])-1][1] \
-            and img[0][0][2] == img[len(img)-1][0][2] == img[len(img)-1][len(img[0])-1][2] == img[0][len(img[0])-1][2]:
-        return img[0][0]
+def Background_from_flattened_image(flattened_image):
+    top_left = Hex(
+        flattened_image[0][2],
+        flattened_image[0][1],
+        flattened_image[0][0]
+    )
+    bottom_right = Hex(
+        flattened_image[len(flattened_image)-1][2],
+        flattened_image[len(flattened_image)-1][1],
+        flattened_image[len(flattened_image)-1][0]
+    )
+    if bottom_right == top_left:
+        return flattened_image[0]
     else:
         return None
 
 
-def Reduce(img, number_of_colors, method="cv2"):
-    if method == "cv2":
-        return Reduce_cv2(img, number_of_colors)
-    elif method == "sklearn":
-        return Reduce_sklearn(img, number_of_colors)
+def Background_from_kmeans_reduced_result(cluster_centers_, labels):
+    top_left = np.array(cluster_centers_[labels[0]] * 255, dtype=np.uint8)
+
+    bottom_right = np.array(
+        cluster_centers_[labels[len(labels)-1]] * 255, dtype=np.uint8)
+
+    top_left_hex = Hex(
+        top_left[2],
+        top_left[1],
+        top_left[0]
+    )
+
+    bottom_right_hex = Hex(
+        bottom_right[2],
+        bottom_right[1],
+        bottom_right[0]
+    )
+
+    if bottom_right_hex == top_left_hex:
+        return np.array(cluster_centers_[labels[0]] * 255, dtype=np.uint8)
     else:
-        raise Exception("jkhgjfh")
+        return None
 
 
-def Reduce_sklearn(img, number_of_colors):
+def Background(img):
+    from shape import Flatten
+    flattened_image = Flatten(img)
+
+    return Background_from_flattened_image(flattened_image)
+
+
+def Matrix_scikit_kmeans(img, number_of_colors):
+    t0 = time()
+    cluster_centers_, labels = Reduce_scikit_kmeans(img, number_of_colors)
+    labels_counts = np.bincount(labels)
+
+    labels_list = np.nonzero(labels_counts)[0]
+    rgb_colors = np.array(cluster_centers_[labels_list] * 255, dtype=np.uint8)
+
+    background = Background_from_kmeans_reduced_result(
+        cluster_centers_, labels)
+
+    background_hex = Hex_from_array(background)
+    LOGGER.info("background_color_dectected=%s", background_hex)
+
+    counts = zip(rgb_colors, labels_counts[labels_list])
+
+    counts_without_background_color = [
+        x for x in counts if Hex_from_array(x[0]) != background_hex
+    ]
+    without_background_count = np.sum(counts_without_background_color, axis=0)
+
+    matrix = {
+        "source": "scikit_kmeans_reduce",
+        "values": []
+    }
+    for rgb, count in counts_without_background_color:
+        percent = float(count) / without_background_count[1]
+        matrix["values"].append({
+            "hex": Hex_from_array(rgb),
+            "percent": percent
+        })
+
+    LOGGER.info("ms=%0.3fs.", (time() - t0))
+    return matrix, cluster_centers_, labels
+
+
+def Reduce_scikit_kmeans(img, number_of_colors):
+    t0 = time()
     from sklearn.cluster import KMeans
     img_64 = np.array(img, dtype=np.float64) / 255
-    w, h, d = original_shape = tuple(china.shape)
+    w, h, d = tuple(img_64.shape)
     assert d == 3
     image_array = np.reshape(img_64, (w * h, d))
 
-    t0 = time()
+    from sklearn.utils import shuffle
     image_array_sample = shuffle(image_array, random_state=1)[:1000]
     kmeans = KMeans(
-        n_clusters=n_colors,
+        n_clusters=number_of_colors,
         random_state=1,
         precompute_distances=True).fit(image_array_sample)
 
-    LOGGER.info(
-        "Fitting model on a small sub-sample of the data,ms=%0.3fs.",
-        (time() - t0))
-
-    t0 = time()
     labels = kmeans.predict(image_array)
-    LOGGER.info(
-        "Predicting color indices on the full image (k-means),ms=%0.3fs.",
-        (time() - t0))
+    LOGGER.info("ms=%0.3fs.", (time() - t0))
 
-    print labels
+    return kmeans.cluster_centers_, labels
 
 
-def Reduce_cv2(img, number_of_colors):
-    start = time()
-    """
-    Reduce image to, number of colors supplied that are most relevant
-    """
-
-    Z = img.reshape((-1, 3))
-    # convert to np.float32
-    Z = np.float32(Z)
-
-    K = number_of_colors
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-
-    ret, label, center = cv2.kmeans(
-        Z,
-        K,
-        criteria,
-        10,
-        cv2.KMEANS_RANDOM_CENTERS)
-
-    # Now convert back into uint8, and make original image
-    center = np.uint8(center)
-    res = center[label.flatten()]
-    res2 = res.reshape((img.shape))
-
-    LOGGER.info('ms=%s' % (ms(start)))
-    return res2
+def Hex_from_array(rgb):
+    return Hex(rgb[2], rgb[1], rgb[0])
 
 
 def Hex(r, g, b):
     return '0x%02x%02x%02x' % (r, g, b)
-
-
-def Matrix(img):
-    """
-    Ignores the background image color, and returns a simplied break down of
-    all the color information in the image, array of percentages
-    """
-    start = time()
-
-    background_image_color = Background(img)
-    if background_image_color is None:
-        return None
-
-    background_color_hex = Hex(
-        background_image_color[2],
-        background_image_color[1],
-        background_image_color[0]
-    )
-
-    from shape import Flatten
-    flattened_image = Flatten(img)
-
-    color_ids = np.array(
-        filter(
-            lambda x: x != background_color_hex,
-            map(
-                lambda x: Hex(x[2], x[1], x[0]),
-                flattened_image
-            )
-        )
-    )
-    color_ids.sort()
-
-    matrix = []
-    for key, group in groupby(color_ids, lambda x: x):
-        percent = float(float(len(list(group))) / len(color_ids))
-        matrix.append({
-            "hex": key,
-            "percent": percent
-        })
-
-    LOGGER.info('ms=%s' % (ms(start)))
-    return matrix
