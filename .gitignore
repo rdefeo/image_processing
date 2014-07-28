@@ -1,6 +1,5 @@
 .vagrant
 node_modules
-data
 other
 */build
 *.pyc
