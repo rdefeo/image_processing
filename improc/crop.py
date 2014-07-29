@@ -33,6 +33,9 @@ def AutoCrop(original_image, labels, background_label):
     (ystop, xstop) = bounding_box.max(0) + 1
 
     bounding_box_image = original_image[ystart:ystop, xstart:xstop]
+    if len(bounding_box_image) == 0:
+        return None, None, None, None, None
+
     top_left_pixel_bounding_box = bounding_box_image[0][0]
     bottom_right_pixel_bounding_box = bounding_box_image[::-1][0][::-1][0]
 

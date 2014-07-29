@@ -120,7 +120,7 @@ def Matrix_scikit_kmeans(img, number_of_colors):
         basic_info["percent"] = percent
         matrix["values"].append(basic_info)
 
-    LOGGER.info("ms=%0.3fs.", (time() - t0))
+    LOGGER.info("ms=%s", ms(t0))
     return matrix, cluster_centers_, labels, background_label
 
 
@@ -140,7 +140,7 @@ def Reduce_scikit_kmeans(img, number_of_colors):
         precompute_distances=True).fit(image_array_sample)
 
     labels = kmeans.predict(image_array)
-    LOGGER.info("ms=%0.3fs.", (time() - t0))
+    LOGGER.info("ms=%s", ms(t0))
 
     return kmeans.cluster_centers_, labels
 

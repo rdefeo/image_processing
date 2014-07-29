@@ -28,8 +28,8 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 n_colors = 5
 
-src = "improc/data/8.jpg"
-src = "improc/data/white_background_data.jpg"
+src = "improc/data/9.jpg"
+# src = "improc/data/white_background_data.jpg"
 test_data = cv2.imread(src)
 
 #
@@ -50,7 +50,7 @@ test_data = cv2.imread(src)
 # sx = ndimage.sobel(test_data, axis=0, mode='constant')
 # sy = ndimage.sobel(test_data, axis=1, mode='constant')
 # sob = np.hypot(sx, sy)
-
+start = time()
 matrix, cluster_centers_, labels, background_label = color.Matrix_scikit_kmeans(test_data, n_colors)
 print matrix
 fast_image, fast_x, fast_y, fast_width, fast_height = crop.AutoCrop(test_data, labels, background_label)
@@ -58,6 +58,7 @@ print fast_x, fast_y, fast_width, fast_height
 # autocrop_image, autocrop_x, autocrop_y, autocrop_width, autocrop_height = crop.AutoCrop(test_data)
 # print autocrop_x, autocrop_y, autocrop_width, autocrop_height
 
+print  (time() - start) * 1000
 print "background_label", background_label
 # t0 = time()
 
