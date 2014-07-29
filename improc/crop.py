@@ -1,9 +1,8 @@
 import logging
 from time import time
 
-import cv2
 import numpy as np
-from color import IsWhite
+from color import IsWhiteish
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,11 +21,7 @@ def Crop(img, x, y, width, height):
 def AutoCrop(original_image, labels, background_label):
     # uses the outputs from Matrix_scikit_kmeans to get work with
     top_left_pixel = original_image[0][0]
-    if (
-        top_left_pixel[0] < 252 or
-        top_left_pixel[1] < 252 or
-        top_left_pixel[2] < 252
-    ):
+    if not IsWhiteish(top_left_pixel):
         return None, None, None, None, None
 
     reshaped_labels = labels.reshape(
@@ -42,17 +37,8 @@ def AutoCrop(original_image, labels, background_label):
     bottom_right_pixel_bounding_box = bounding_box_image[::-1][0][::-1][0]
 
     if (
-        (
-            top_left_pixel_bounding_box[0] < 252 or
-            top_left_pixel_bounding_box[1] < 252 or
-            top_left_pixel_bounding_box[2] < 252
-        )
-        and
-        (
-            bottom_right_pixel_bounding_box[0] < 252 or
-            bottom_right_pixel_bounding_box[1] < 252 or
-            bottom_right_pixel_bounding_box[2] < 252
-        )
+        not IsWhiteish(top_left_pixel_bounding_box) or
+        not IsWhiteish(bottom_right_pixel_bounding_box)
     ):
         return None, None, None, None, None
 

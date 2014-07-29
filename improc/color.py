@@ -14,6 +14,17 @@ def IsWhite(pixel):
     return pixel[0] == 255 and pixel[1] == 255 and pixel[2] == 255
 
 
+def IsWhiteish(pixel):
+    if (
+        pixel[0] < 252 or
+        pixel[1] < 252 or
+        pixel[2] < 252
+    ):
+        return False
+    else:
+        return True
+
+
 def Background_from_flattened_image(flattened_image):
     top_left = Hex(
         flattened_image[0][2],
