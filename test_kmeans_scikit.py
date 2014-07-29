@@ -28,9 +28,40 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 n_colors = 5
 
-src = "improc/data/9.jpg"
+src = "improc/data/2.jpg"
 # src = "improc/data/white_background_data.jpg"
 test_data = cv2.imread(src)
+
+img_64 = np.array(test_data, dtype=np.float64) / 255
+w, h, d = tuple(img_64.shape)
+assert d == 3
+image_array = np.reshape(img_64, (w * h, d))
+
+
+t0 = time()
+
+from sklearn.utils import shuffle
+image_array_sample = shuffle(image_array, random_state=1)[:1000]
+
+print "to beat %s" % ((time() - t0) * 1000)
+print image_array_sample.shape
+print image_array_sample
+
+
+t0 = time()
+
+from sklearn.utils import resample
+# attempt_array_sample = np.copy(image_array)
+# print "attempt_array_sample", attempt_array_sample.shape
+attempt_array_sample = resample(image_array, replace=True, n_samples=1000, random_state=1)
+
+# attempt_array_sample = np.random.permutation(image_array, 10)
+
+print "attempt %s" % ((time() - t0) * 1000)
+print attempt_array_sample.shape
+print attempt_array_sample
+
+print "image_array", image_array
 
 #
 #

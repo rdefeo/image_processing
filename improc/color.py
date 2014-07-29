@@ -132,8 +132,10 @@ def Reduce_scikit_kmeans(img, number_of_colors):
     assert d == 3
     image_array = np.reshape(img_64, (w * h, d))
 
-    from sklearn.utils import shuffle
-    image_array_sample = shuffle(image_array, random_state=1)[:1000]
+    from sklearn.utils import resample
+    image_array_sample = resample(
+        image_array, replace=True, n_samples=1000, random_state=1)
+
     kmeans = KMeans(
         n_clusters=number_of_colors,
         random_state=1,
