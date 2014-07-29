@@ -29,6 +29,9 @@ def AutoCrop(original_image, labels, background_label):
     start = time()
 
     bounding_box = np.argwhere(reshaped_labels != background_label)
+    if len(bounding_box) == 0:
+        return None, None, None, None, None
+        
     (ystart, xstart) = bounding_box.min(0) - 1
     (ystop, xstop) = bounding_box.max(0) + 1
 

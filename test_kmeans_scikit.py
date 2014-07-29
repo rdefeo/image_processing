@@ -3,7 +3,7 @@
 #          Mathieu Blondel <mathieu@mblondel.org>
 #
 # License: BSD 3 clause
-
+import cProfile
 print(__doc__)
 from time import time
 
@@ -51,6 +51,7 @@ test_data = cv2.imread(src)
 # sy = ndimage.sobel(test_data, axis=1, mode='constant')
 # sob = np.hypot(sx, sy)
 start = time()
+print cProfile.run("img = cv2.imread('improc/data/1.jpg')\nmatrix, cluster_centers_, labels, background_label = color.Matrix_scikit_kmeans(test_data, n_colors)")
 matrix, cluster_centers_, labels, background_label = color.Matrix_scikit_kmeans(test_data, n_colors)
 print matrix
 fast_image, fast_x, fast_y, fast_width, fast_height = crop.AutoCrop(test_data, labels, background_label)
