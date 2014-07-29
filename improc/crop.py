@@ -1,5 +1,5 @@
 import logging
-import time
+from time import time
 
 import cv2
 import numpy as np
@@ -9,88 +9,54 @@ LOGGER = logging.getLogger(__name__)
 
 
 def ms(start):
-    return (time.time() - start) * 1000
+    return (time() - start) * 1000
 
 
 def Crop(img, x, y, width, height):
+    # original_image[ystart:ystop, xstart:xstop]
     return img[y:y + height, x:x + width]
     # Crop from x, y, w, h -> 100, 200, 300, 400
     # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
 
 
-def AutoCrop_calculate_row(row, new_img, found, counter):
-    min_num_non_white_pixels = 10
-    non_white_pixels = [x for x in row if x[0] < 253 and x[1] < 253 and x[2] < 253]
-    if len(non_white_pixels) > min_num_non_white_pixels:
-        found = True
-        new_img.append(row)
-    elif not found:
-        counter += 1
+def AutoCrop(original_image, labels, background_label):
+    # uses the outputs from Matrix_scikit_kmeans to get work with
+    top_left_pixel = original_image[0][0]
+    if (
+        top_left_pixel[0] < 252 or
+        top_left_pixel[1] < 252 or
+        top_left_pixel[2] < 252
+    ):
+        return None, None, None, None, None
 
-    return new_img, found, counter
+    reshaped_labels = labels.reshape(
+        original_image.shape[0], original_image.shape[1])
+    start = time()
 
+    bounding_box = np.argwhere(reshaped_labels != background_label)
+    (ystart, xstart) = bounding_box.min(0) - 1
+    (ystop, xstop) = bounding_box.max(0) + 1
 
-def AutoCrop_calculate_rowv2(row, new_img, found, counter):
-    min_num_non_white_pixels = 10
-    non_white_pixels = 0
-    for x in row:
-        if non_white_pixels > min_num_non_white_pixels:
-            found = True
-            new_img.append(row)
-            break
+    bounding_box_image = original_image[ystart:ystop, xstart:xstop]
+    top_left_pixel_bounding_box = bounding_box_image[0][0]
+    bottom_right_pixel_bounding_box = bounding_box_image[::-1][0][::-1][0]
 
-        if x[0] < 253 and x[1] < 253 and x[2] < 253:
-            non_white_pixels += 1
-
-    # if len(non_white_pixels) > 10:
-        # xfound = True
-        # crop_img_rotated.append(row)
-
-    if not found and non_white_pixels <= min_num_non_white_pixels:
-        counter += 1
-
-    return new_img, found, counter
-
-
-def AutoCrop(img):
-    """
-    returns x, y, width, height
-    """
-    start = time.time()
-    img = img.swapaxes(1, 0)
-    crop_img_rotated = []
-    xfound = False
-    # want to have a sligher before
-    counterx = -1
-    min_num_non_white_pixels = 10
-    return_value = None, None, None, None, None
-    if IsWhite(img[0][0]) and IsWhite(img[len(img)-1][0]) and IsWhite(img[len(img)-1][len(img[0])-1]) and IsWhite(img[0][len(img[0])-1]):
-        # any (e for e in [1, 2, 'joe'] if isinstance(e, int) and e > 0)
-        for row in img:
-            crop_img_rotated, xfound, counterx = AutoCrop_calculate_rowv2(
-                row, crop_img_rotated, xfound, counterx)
-
-        yfound = False
-        # want to have a sligther before
-        countery = -1
-
-        img = np.array(crop_img_rotated).swapaxes(1, 0)
-        crop_img = []
-        for row in img:
-            crop_img, yfound, countery = AutoCrop_calculate_rowv2(
-                row, crop_img, yfound, countery)
-
-        cropped = np.array(crop_img)
-
-        if countery == -1 or counterx == -1:
-            return_value = None, None, None, None, None
-        elif not IsWhite(cropped[0][0]) and not IsWhite(cropped[len(cropped)-1][0]) and not IsWhite(cropped[len(cropped)-1][len(cropped[0])-1]) and not IsWhite(cropped[0][len(cropped[0])-1]):
-            return_value = None, None, None, None, None
-        else:
-            return_value = cropped, counterx, countery, cropped.shape[1] + 2, cropped.shape[0] + 2
-
-    else:
-        return_value = None, None, None, None, None
+    if (
+        (
+            top_left_pixel_bounding_box[0] < 252 or
+            top_left_pixel_bounding_box[1] < 252 or
+            top_left_pixel_bounding_box[2] < 252
+        )
+        and
+        (
+            bottom_right_pixel_bounding_box[0] < 252 or
+            bottom_right_pixel_bounding_box[1] < 252 or
+            bottom_right_pixel_bounding_box[2] < 252
+        )
+    ):
+        return None, None, None, None, None
 
     LOGGER.info('ms=%s' % (ms(start)))
-    return return_value
+
+    return bounding_box_image, xstart, ystart, xstop - xstart, ystop - ystart
+    # return cropped_image, x, y, width, height

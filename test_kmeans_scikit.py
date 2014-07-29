@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import improc.shape as shape
 import improc.color as color
+import improc.crop as crop
 import logging
 LOG_FORMAT = (
     'level=%(levelname)s,ts=%(asctime)s,name=%(name)s,'
@@ -27,14 +28,70 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 n_colors = 5
 
-src = "improc/data/6.jpg"
+src = "improc/data/8.jpg"
+src = "improc/data/white_background_data.jpg"
 test_data = cv2.imread(src)
 
-matrix, cluster_centers_, labels = color.Matrix_scikit_kmeans(cv2.imread(src), n_colors)
-print "new", matrix
+#
+#
+# A = np.array([[0, 0, 0, 1, 1, 0, 0],
+#            [0, 0, 0, 0, 0, 0, 0],
+#            [0, 0, 1, 0, 0, 0, 0],
+#            [0, 0, 1, 1, 0, 0, 0],
+#            [0, 0, 0, 0, 1, 0, 0],
+#            [0, 0, 0, 0, 0, 0, 0],
+#            [0, 0, 0, 0, 0, 0, 100]])
+#
+# print "last", A[::-1][0][::-1][0]
+# print "somthing"
+#
+# from scipy import ndimage
+#
+# sx = ndimage.sobel(test_data, axis=0, mode='constant')
+# sy = ndimage.sobel(test_data, axis=1, mode='constant')
+# sob = np.hypot(sx, sy)
 
-reduced = color.Reduce_cv2(cv2.imread(src), n_colors)
-print "old", color.Matrix(reduced)
+matrix, cluster_centers_, labels, background_label = color.Matrix_scikit_kmeans(test_data, n_colors)
+print matrix
+fast_image, fast_x, fast_y, fast_width, fast_height = crop.AutoCrop(test_data, labels, background_label)
+print fast_x, fast_y, fast_width, fast_height
+# autocrop_image, autocrop_x, autocrop_y, autocrop_width, autocrop_height = crop.AutoCrop(test_data)
+# print autocrop_x, autocrop_y, autocrop_width, autocrop_height
+
+print "background_label", background_label
+# t0 = time()
+
+# print "cluster_centers_.shape", cluster_centers_.shape
+# print "labels.shape", labels.shape
+# print "test_data.shape", test_data.shape
+
+# print "not sure what it is", np.memmap(test_data, dtype=np.int64, shape=test_data.shape)
+# reshaped_labels = labels.reshape(test_data.shape[0], test_data.shape[1])
+# reshaped_labels = np.arange(6).reshape(2,3)
+# print  reshaped_labels
+# print  reshaped_labels.shape
+# print np.trim_zeros(reshaped_labels)
+# print "cluster_centers_", cluster_centers_
+#
+# bounding_box = np.argwhere(reshaped_labels != background_label)
+# (ystart, xstart) = bounding_box.min(0) - 1
+# (ystop, xstop) = bounding_box.max(0) + 1
+# print "args-start", (ystart, xstart)
+# print "args-stop", (ystop, xstop)
+#
+# bounding_box_test_data = test_data[ystart:ystop, xstart:xstop]
+# print "Atrim-cords", ystart, ystop, xstart, xstop
+#
+# print("things done in %0.3fs." % (time() - t0))
+# from PIL import Image
+# im = Image.open(src)
+# print im.getbbox()
+# im2=im.crop(im.getbbox())
+# im2.show()
+
+
+# reduced = color.Reduce_cv2(cv2.imread(src), n_colors)
+# print "old", color.Matrix(reduced)
 
 # cluster_centers_, labels = color.Reduce_sklearn(cv2.imread("improc/data/6.jpg"), n_colors)
 # china = np.array(test_data, dtype=np.float64) / 255
@@ -110,15 +167,21 @@ def recreate_image(codebook, labels, w, h):
     return image
 
 cv2.imshow('Original image (96,615 colors)', test_data)
+# cv2.imshow('bounding_box_test_data', bounding_box_test_data)
+# if autocrop_image is not None:
+#     cv2.imshow('autocrop_image', autocrop_image)
+if fast_image is not None:
+    cv2.imshow('fast_image', fast_image)
 # print len(cluster), w, d, h
 
 # cv2.imshow(
 #     'Quantized image (64 colors, K-Means)',
 #     reshaped)
 # colormatrix_image(cluster_centers_, labels, w, h)
-cv2.imshow(
-    'Quantized image (64 colors, K-Means)',
-    recreate_image(cluster_centers_, labels, w, h))
+if cluster_centers_  is not None:
+    cv2.imshow(
+        'Quantized image (64 colors, K-Means)',
+        recreate_image(cluster_centers_, labels, w, h))
 # cv2.imshow(
 #     'Quantized image (64 colors, Random)',
 #     recreate_image(codebook_random, labels_random, w, h))

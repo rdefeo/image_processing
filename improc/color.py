@@ -50,9 +50,18 @@ def Background_from_kmeans_reduced_result(cluster_centers_, labels):
     )
 
     if bottom_right_hex == top_left_hex:
-        return np.array(cluster_centers_[labels[0]] * 255, dtype=np.uint8)
+        return (
+            np.array(cluster_centers_[labels[0]] * 255, dtype=np.uint8),
+            labels[0]
+        )
     else:
-        return None
+        LOGGER.info(
+            "non matching background corners,top_left_hex=%s"
+            ",bottom_right_hex=%s",
+            top_left_hex,
+            bottom_right_hex
+            )
+        return None, None
 
 
 def Background(img):
@@ -70,8 +79,11 @@ def Matrix_scikit_kmeans(img, number_of_colors):
     labels_list = np.nonzero(labels_counts)[0]
     rgb_colors = np.array(cluster_centers_[labels_list] * 255, dtype=np.uint8)
 
-    background = Background_from_kmeans_reduced_result(
+    background, background_label = Background_from_kmeans_reduced_result(
         cluster_centers_, labels)
+
+    if background is None and background_label is None:
+        return None, None, None, None
 
     background_hex = Hex_from_array(background)
     LOGGER.info("background_color_dectected=%s", background_hex)
@@ -89,13 +101,16 @@ def Matrix_scikit_kmeans(img, number_of_colors):
     }
     for rgb, count in counts_without_background_color:
         percent = float(count) / without_background_count[1]
+        hex_value = Hex_from_array(rgb)
         matrix["values"].append({
-            "hex": Hex_from_array(rgb),
+            "hex": hex_value,
+            "decimal": int(hex_value, 0),
+            "rgb": rgb[::-1].tolist(),
             "percent": percent
         })
 
     LOGGER.info("ms=%0.3fs.", (time() - t0))
-    return matrix, cluster_centers_, labels
+    return matrix, cluster_centers_, labels, background_label
 
 
 def Reduce_scikit_kmeans(img, number_of_colors):
