@@ -25,23 +25,6 @@ def IsWhiteish(pixel):
         return True
 
 
-def Background_from_flattened_image(flattened_image):
-    top_left = Hex(
-        flattened_image[0][2],
-        flattened_image[0][1],
-        flattened_image[0][0]
-    )
-    bottom_right = Hex(
-        flattened_image[len(flattened_image)-1][2],
-        flattened_image[len(flattened_image)-1][1],
-        flattened_image[len(flattened_image)-1][0]
-    )
-    if bottom_right == top_left:
-        return flattened_image[0]
-    else:
-        return None
-
-
 def Background_from_kmeans_reduced_result(cluster_centers_, labels):
     top_left = np.array(cluster_centers_[labels[0]] * 255, dtype=np.uint8)
 
@@ -75,11 +58,32 @@ def Background_from_kmeans_reduced_result(cluster_centers_, labels):
         return None, None
 
 
-def Background(img):
-    from shape import Flatten
-    flattened_image = Flatten(img)
+def Basic_color_info(pixel):
+    hex_value = Hex_from_array(pixel)
+    return {
+        "hex": hex_value,
+        "decimal": int(hex_value, 0),
+        "rgb": pixel[::-1].tolist()
+    }
 
-    return Background_from_flattened_image(flattened_image)
+
+def Background(img):
+    top_left_pixel = img[0][0]
+    bottom_right_pixel = img[::-1][0][::-1][0]
+    top_left_hex = Hex(
+        top_left_pixel[2],
+        top_left_pixel[1],
+        top_left_pixel[0]
+    )
+    bottom_right_hex = Hex(
+        bottom_right_pixel[2],
+        bottom_right_pixel[1],
+        bottom_right_pixel[0]
+    )
+    if bottom_right_hex == top_left_hex:
+        return top_left_pixel
+    else:
+        return None
 
 
 def Matrix_scikit_kmeans(img, number_of_colors):
@@ -112,13 +116,9 @@ def Matrix_scikit_kmeans(img, number_of_colors):
     }
     for rgb, count in counts_without_background_color:
         percent = float(count) / without_background_count[1]
-        hex_value = Hex_from_array(rgb)
-        matrix["values"].append({
-            "hex": hex_value,
-            "decimal": int(hex_value, 0),
-            "rgb": rgb[::-1].tolist(),
-            "percent": percent
-        })
+        basic_info = Basic_color_info(rgb)
+        basic_info["percent"] = percent
+        matrix["values"].append(basic_info)
 
     LOGGER.info("ms=%0.3fs.", (time() - t0))
     return matrix, cluster_centers_, labels, background_label
