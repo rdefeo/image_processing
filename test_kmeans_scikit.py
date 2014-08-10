@@ -20,6 +20,7 @@ import improc.shape as shape
 import improc.color as color
 import improc.crop as crop
 import logging
+import json
 LOG_FORMAT = (
     'level=%(levelname)s,ts=%(asctime)s,name=%(name)s,'
     'funcName=%(funcName)s,lineno=%(lineno)s'
@@ -31,6 +32,10 @@ n_colors = 5
 src = "improc/data/2.jpg"
 # src = "improc/data/white_background_data.jpg"
 test_data = cv2.imread(src)
+
+normal_list = test_data.tolist()
+
+print json.dumps(normal_list)
 
 img_64 = np.array(test_data, dtype=np.float64) / 255
 w, h, d = tuple(img_64.shape)
@@ -204,6 +209,8 @@ cv2.imshow('Original image (96,615 colors)', test_data)
 # if autocrop_image is not None:
 #     cv2.imshow('autocrop_image', autocrop_image)
 if fast_image is not None:
+    cv2.imwrite("improc/data/test_data.jpg", test_data)
+    cv2.imwrite("improc/data/fast_image.jpg", fast_image)
     cv2.imshow('fast_image', fast_image)
 # print len(cluster), w, d, h
 
