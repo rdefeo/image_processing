@@ -26,3 +26,6 @@ def autocrop(img):
     ) = AutoCrop(img, labels, background_label)
 
     return img_autocrop
+
+def resize(img, size):
+    return cv2.resize(img, size)
