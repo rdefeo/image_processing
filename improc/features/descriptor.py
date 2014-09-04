@@ -4,7 +4,7 @@ import time
 import cv2
 import mahotas.features
 import numpy as np
-from preprocess import grey, autocrop, resize
+from preprocess import grey, autocrop, resize, add_border
 
 LOGGER = logging.getLogger(__name__)
 
@@ -96,19 +96,24 @@ class RgbHistogramDescriptor(FeatureDescriptor):
 
 
 class ZernikeDescriptor(FeatureDescriptor):
+    """
+
+    """
     def __init__(self,
                  preprocess=True,
                  radius=21,
                  size=(250, 250),
                  resize={"enabled": True, "width": 250, "height": 250},
                  grey={"enabled": True},
-                 autocrop={"enabled": True}
+                 autocrop={"enabled": True},
+                 add_border={"enabled": True, "color_value": 0, "border_size": 15}
     ):
         self.name = "zernike"
         self.properties["radius"] = radius
         self.properties["resize"] = resize
         self.properties["grey"] = grey
         self.properties["autocrop"] = autocrop
+        self.properties["add_border"] = add_border
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
@@ -126,6 +131,13 @@ class ZernikeDescriptor(FeatureDescriptor):
                     self.properties["resize"]["width"],
                     self.properties["resize"]["height"]
                 )
+            )
+
+        if self.properties["add_border"]["enabled"]:
+            x = add_border(
+                x,
+                border_size=self.properties["add_border"]["border_size"],
+                color_value=self.properties["add_border"]["color_value"]
             )
 
 

@@ -29,3 +29,11 @@ def autocrop(img):
 
 def resize(img, size):
     return cv2.resize(img, size)
+
+def add_border(img, border_size=15, color_value=255):
+    return cv2.copyMakeBorder(
+        img,
+        border_size, border_size, border_size, border_size,
+        cv2.BORDER_CONSTANT,
+        value=color_value
+    )
