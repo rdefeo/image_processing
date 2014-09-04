@@ -2,7 +2,11 @@ __author__ = 'robdefeo'
 import cv2
 from improc.color import Matrix_scikit_kmeans
 from improc.crop import AutoCrop
+from improc.shape import ScaleMax
 import numpy as np
+
+def scale_max(img, width=100, height=100):
+    return ScaleMax(img, width=width, height=height)
 
 def grey(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

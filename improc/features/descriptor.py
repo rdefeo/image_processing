@@ -4,7 +4,7 @@ import time
 import cv2
 import mahotas.features
 import numpy as np
-from preprocess import grey, autocrop, resize, add_border, outline_contour, thresh, bitwise
+from preprocess import grey, autocrop, resize, add_border, outline_contour, thresh, bitwise, scale_max
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,13 +102,14 @@ class ZernikeDescriptor(FeatureDescriptor):
     def __init__(self,
                  preprocess=True,
                  radius=21,
-                 resize={"enabled": True, "width": 250, "height": 250},
+                 resize={"enabled": False, "width": 250, "height": 250},
                  grey={"enabled": True},
                  autocrop={"enabled": True},
                  outline_contour={"enabled": True},
                  add_border={"enabled": True, "color_value": 0, "border_size": 15},
                  bitwise_info={"enabled": True},
-                 thresh={"enabled": True}
+                 thresh={"enabled": True},
+                 scale_max={"enabled": True, "width": 250, "height": 250}
     ):
         self.name = "zernike"
         self.properties["radius"] = radius
@@ -119,6 +120,8 @@ class ZernikeDescriptor(FeatureDescriptor):
         self.properties["outline_contour"] = outline_contour
         self.properties["bitwise"] = bitwise_info
         self.properties["thresh"] = thresh
+        self.properties["scale_max"] = scale_max
+
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
@@ -144,6 +147,14 @@ class ZernikeDescriptor(FeatureDescriptor):
                 (
                     self.properties["resize"]["width"],
                     self.properties["resize"]["height"]
+                )
+            )
+        elif self.properties["scale_max"]["enabled"]:
+            x = scale_max(
+                x,
+                (
+                    self.properties["scale_max"]["width"],
+                    self.properties["scale_max"]["height"]
                 )
             )
 
