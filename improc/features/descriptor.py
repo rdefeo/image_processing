@@ -4,7 +4,7 @@ import time
 import cv2
 import mahotas.features
 import numpy as np
-from preprocess import grey, autocrop, resize, add_border
+from preprocess import grey, autocrop, resize, add_border, outline_contour
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,18 +102,19 @@ class ZernikeDescriptor(FeatureDescriptor):
     def __init__(self,
                  preprocess=True,
                  radius=21,
-                 size=(250, 250),
-                 resize={"enabled": True, "width": 250, "height": 250},
-                 grey={"enabled": True},
-                 autocrop={"enabled": True},
-                 add_border={"enabled": True, "color_value": 0, "border_size": 15}
+                 resize_info={"enabled": True, "width": 250, "height": 250},
+                 grey_info={"enabled": True},
+                 autocrop_info={"enabled": True},
+                 outline_contour_info={"enabled": True},
+                 add_border_info={"enabled": True, "color_value": 0, "border_size": 15}
     ):
         self.name = "zernike"
         self.properties["radius"] = radius
-        self.properties["resize"] = resize
-        self.properties["grey"] = grey
-        self.properties["autocrop"] = autocrop
-        self.properties["add_border"] = add_border
+        self.properties["resize"] = resize_info
+        self.properties["grey"] = grey_info
+        self.properties["autocrop"] = autocrop_info
+        self.properties["add_border"] = add_border_info
+        self.properties["outline_contour"] = outline_contour_info
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
@@ -123,6 +124,11 @@ class ZernikeDescriptor(FeatureDescriptor):
 
         if self.properties["grey"]["enabled"]:
             x = grey(x)
+
+        # thresh
+
+        if self.properties["outline_contour"]["enabled"]:
+            x = outline_contour(x)
 
         if self.properties["resize"]["enabled"]:
             x = resize(
@@ -140,8 +146,6 @@ class ZernikeDescriptor(FeatureDescriptor):
                 color_value=self.properties["add_border"]["color_value"]
             )
 
-
-        return cv2.resize(x, self.properties["size"])
 
     def describe(self, img):
         start = time.time()
