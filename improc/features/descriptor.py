@@ -4,7 +4,7 @@ import time
 import cv2
 import mahotas.features
 import numpy as np
-from preprocess import grey, autocrop, resize, add_border, outline_contour
+from preprocess import grey, autocrop, resize, add_border, outline_contour, thresh_bitwise
 
 LOGGER = logging.getLogger(__name__)
 
@@ -114,7 +114,8 @@ class ZernikeDescriptor(FeatureDescriptor):
         self.properties["grey"] = grey_info
         self.properties["autocrop"] = autocrop_info
         self.properties["add_border"] = add_border_info
-        self.properties["outline_contour"] = outline_contour_info
+        self.properties["outline_contour"] = outline_contour_info,
+        self.properties["thresh_bitwise"] = thresh_bitwise,
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
@@ -125,7 +126,8 @@ class ZernikeDescriptor(FeatureDescriptor):
         if self.properties["grey"]["enabled"]:
             x = grey(x)
 
-        # thresh
+        if self.properties["thresh_bitwise"]["enabled"]:
+            x = thresh_bitwise(x)
 
         if self.properties["outline_contour"]["enabled"]:
             x = outline_contour(x)

@@ -47,3 +47,9 @@ def outline_contour(img):
     cv2.drawContours(outline, [cnts], -1, 255, -1)
 
     return outline
+
+def thresh_bitwise(img):
+    thresh = cv2.bitwise_not(img)
+    thresh[thresh > 0] = 255
+
+    return thresh
