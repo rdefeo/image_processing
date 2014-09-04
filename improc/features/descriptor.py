@@ -102,21 +102,23 @@ class ZernikeDescriptor(FeatureDescriptor):
     def __init__(self,
                  preprocess=True,
                  radius=21,
-                 resize_info={"enabled": True, "width": 250, "height": 250},
-                 grey_info={"enabled": True},
-                 autocrop_info={"enabled": True},
-                 outline_contour_info={"enabled": True},
-                 add_border_info={"enabled": True, "color_value": 0, "border_size": 15}
+                 resize={"enabled": True, "width": 250, "height": 250},
+                 grey={"enabled": True},
+                 autocrop={"enabled": True},
+                 outline_contour={"enabled": True},
+                 add_border={"enabled": True, "color_value": 0, "border_size": 15},
+                 bitwise_info={"enabled": True},
+                 thresh={"enabled": True}
     ):
         self.name = "zernike"
         self.properties["radius"] = radius
-        self.properties["resize"] = resize_info
-        self.properties["grey"] = grey_info
-        self.properties["autocrop"] = autocrop_info
-        self.properties["add_border"] = add_border_info
-        self.properties["outline_contour"] = outline_contour_info,
-        self.properties["bitwise"] = bitwise,
-        self.properties["thresh"] = thresh,
+        self.properties["resize"] = resize
+        self.properties["grey"] = grey
+        self.properties["autocrop"] = autocrop
+        self.properties["add_border"] = add_border
+        self.properties["outline_contour"] = outline_contour
+        self.properties["bitwise"] = bitwise_info
+        self.properties["thresh"] = thresh
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
@@ -152,6 +154,7 @@ class ZernikeDescriptor(FeatureDescriptor):
                 color_value=self.properties["add_border"]["color_value"]
             )
 
+        return x
 
     def describe(self, img):
         start = time.time()
