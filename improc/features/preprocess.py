@@ -48,8 +48,10 @@ def outline_contour(img):
 
     return outline
 
-def thresh_bitwise(img):
-    thresh = cv2.bitwise_not(img)
-    thresh[thresh > 0] = 255
+def bitwise(img):
+    return cv2.bitwise_not(img)
 
-    return thresh
+def thresh(img):
+    img[img > 0] = 255
+
+    return img
