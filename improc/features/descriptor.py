@@ -152,10 +152,8 @@ class ZernikeDescriptor(FeatureDescriptor):
         elif self.properties["scale_max"]["enabled"]:
             x = scale_max(
                 x,
-                (
-                    self.properties["scale_max"]["width"],
-                    self.properties["scale_max"]["height"]
-                )
+                self.properties["scale_max"]["width"],
+                self.properties["scale_max"]["height"]
             )
 
         if self.properties["add_border"]["enabled"]:
