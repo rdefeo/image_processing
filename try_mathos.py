@@ -1,4 +1,4 @@
-from improc.data import GetterExtractor
+xfrom improc.data import GetterExtractor
 from improc.features.descriptor import HarlickDescriptor, RgbHistogramDescriptor, ZernikeDescriptor
 from improc.features.comparator import ChiSquaredComparator, EuclideanComparator, ManhattanComparator, ChebyshevComparator, CosineComparator, HammingComparator
 import improc.features.query as feature_query
