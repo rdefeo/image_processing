@@ -1,10 +1,13 @@
 import logging
 import time
 
+import uuid
+
 import cv2
 import mahotas.features
 import numpy as np
-from preprocess import grey, autocrop, resize, add_border, outline_contour, thresh, bitwise, scale_max
+import preprocess
+# from preprocess import grey, autocrop, resize, add_border, outline_contour, thresh, bitwise, scale_max, canny, gaussian_blur
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,14 +105,19 @@ class ZernikeDescriptor(FeatureDescriptor):
     def __init__(self,
                  preprocess=True,
                  radius=21,
+                 dilate={"enabled": False, "width": 5, "height": 5, "iterations": 1},
+                 closing={"enabled": False, "width": 5, "height": 5},
                  resize={"enabled": False, "width": 250, "height": 250},
                  grey={"enabled": True},
                  autocrop={"enabled": True},
+                 canny={"enabled": True, "threshold1": 100, "threshold2": 200},
                  outline_contour={"enabled": True},
-                 add_border={"enabled": True, "color_value": 0, "border_size": 15},
+                 add_border={"enabled": True, "color_value": 0, "border_size": 15, "fill_dimensions": True},
                  bitwise_info={"enabled": True},
                  thresh={"enabled": True},
-                 scale_max={"enabled": True, "width": 250, "height": 250}
+                 gaussian_blur={"enabled": False, "ksize_width": 5, "ksize_height": 5, "sigmaX": 0},
+                 scale_max={"enabled": True, "width": 250, "height": 250},
+                 laplacian={"enabled": False}
     ):
         self.name = "zernike"
         self.properties["radius"] = radius
@@ -121,28 +129,73 @@ class ZernikeDescriptor(FeatureDescriptor):
         self.properties["bitwise"] = bitwise_info
         self.properties["thresh"] = thresh
         self.properties["scale_max"] = scale_max
+        self.properties["canny"] = canny
+        self.properties["gaussian_blur"] = gaussian_blur
+        self.properties["laplacian"] = laplacian
+        self.properties["dilate"] = dilate
+        self.properties["closing"] = closing
 
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
         x = np.copy(img)
         if self.properties["autocrop"]["enabled"]:
-            x = autocrop(x)
+            x = preprocess.autocrop(x)
+
+        if x is None:
+            return None
+
+        if self.properties["gaussian_blur"]["enabled"]:
+            x = preprocess.gaussian_blur(
+                x,
+                (
+                    self.properties["gaussian_blur"]["ksize_width"],
+                    self.properties["gaussian_blur"]["ksize_height"]
+                ),
+                self.properties["gaussian_blur"]["sigmaX"]
+            )
 
         if self.properties["grey"]["enabled"]:
-            x = grey(x)
+            x = preprocess.grey(x)
 
         if self.properties["bitwise"]["enabled"]:
-            x = bitwise(x)
+            x = preprocess.bitwise(x)
+
+
+        if self.properties["canny"]["enabled"]:
+            x = preprocess.canny(
+                x,
+                self.properties["canny"]["threshold1"],
+                self.properties["canny"]["threshold2"]
+            )
+
+        if self.properties["laplacian"]["enabled"]:
+            x = preprocess.laplacian(x)
 
         if self.properties["thresh"]["enabled"]:
-            x = thresh(x)
+            x = preprocess.thresh(x)
+
+        if self.properties["closing"]["enabled"]:
+            x = preprocess.closing(
+                x,
+                self.properties["closing"]["width"],
+                self.properties["closing"]["height"]
+            )
+
+        if self.properties["dilate"]["enabled"]:
+            x = preprocess.dilate(
+                x,
+                self.properties["dilate"]["width"],
+                self.properties["dilate"]["height"],
+                self.properties["dilate"]["iterations"]
+            )
 
         if self.properties["outline_contour"]["enabled"]:
-            x = outline_contour(x)
+            x = preprocess.outline_contour(x)
+
 
         if self.properties["resize"]["enabled"]:
-            x = resize(
+            x = preprocess.resize(
                 x,
                 (
                     self.properties["resize"]["width"],
@@ -150,17 +203,18 @@ class ZernikeDescriptor(FeatureDescriptor):
                 )
             )
         elif self.properties["scale_max"]["enabled"]:
-            x = scale_max(
+            x = preprocess.scale_max(
                 x,
                 self.properties["scale_max"]["width"],
                 self.properties["scale_max"]["height"]
             )
 
         if self.properties["add_border"]["enabled"]:
-            x = add_border(
+            x = preprocess.add_border(
                 x,
                 border_size=self.properties["add_border"]["border_size"],
-                color_value=self.properties["add_border"]["color_value"]
+                color_value=self.properties["add_border"]["color_value"],
+                fill_dimensions=self.properties["add_border"]["fill_dimensions"]
             )
 
         return x
@@ -170,6 +224,13 @@ class ZernikeDescriptor(FeatureDescriptor):
         x = img
         if self.preprocess:
             x = self.do_preprocess(img)
+            if x is None:
+                return None
+
+            # cv2.destroyWindow("preprocessed")
+            # cv2.imshow("preprocessed", x)
+            # cv2.imshow(str(uuid.uuid4()), x)
+
 
         value = mahotas.features.zernike_moments(x, self.properties["radius"])
         result = self.create_result(img, value)

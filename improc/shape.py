@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-
+import logging
+LOGGER = logging.getLogger(__name__)
 
 def Flatten(img):
     """
@@ -28,7 +29,10 @@ def ScaleHeight(img, height):
 
     # perform the actual resizing of the image and show it
     resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-    print "action=ScaleWidth,width=%s,height=%s" % (resized.shape[1], resized.shape[0])
+    LOGGER.info(
+        "action=ScaleHeight,width=%s,height=%s",
+        resized.shape[1], resized.shape[0]
+    )
     return resized
 
 
@@ -38,5 +42,8 @@ def ScaleWidth(img, width):
 
     # perform the actual resizing of the image and show it
     resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
-    print "action=ScaleWidth,width=%s,height=%s" % (resized.shape[1], resized.shape[0])
+    LOGGER.info(
+        "action=ScaleWidth,width=%s,height=%s",
+        resized.shape[1], resized.shape[0]
+    )
     return resized

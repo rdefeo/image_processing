@@ -3,6 +3,8 @@ import cv2
 from improc.color import Matrix_scikit_kmeans
 from improc.crop import AutoCrop
 from improc.shape import ScaleMax, ScaleHeight, ScaleWidth
+from skimage import filter
+from skimage import measure
 import numpy as np
 
 def scale_max(img, width=250, height=250):
@@ -33,11 +35,11 @@ def resize(img, size):
     return cv2.resize(img, size)
 
 
-def add_border(img, color_value=255, width=250, height=250, border_size=15):
+def add_border(img, color_value=255, width=250, height=250, border_size=15, fill_dimensions=True):
     bottom = border_size
     left = border_size
-    right = (width - img.shape[1]) + border_size
-    top = (height - img.shape[0]) + border_size
+    right = (width - img.shape[1]) + border_size if fill_dimensions else border_size
+    top = (height - img.shape[0]) + border_size if fill_dimensions else border_size
 
     return cv2.copyMakeBorder(
         img,
@@ -66,10 +68,27 @@ def outline_contour(img):
 
     return outline
 
+def canny(img, threshold1=100, threshold2=200):
+    return cv2.Canny(img, threshold1, threshold2)
+
 def bitwise(img):
     return cv2.bitwise_not(img)
 
+def gaussian_blur(img, ksize=(5, 5), sigmaX=0):
+    return cv2.GaussianBlur(img, ksize, sigmaX)
+
+def laplacian(img):
+    return cv2.Laplacian(img,cv2.CV_64F)
+
 def thresh(img):
     img[img > 0] = 255
-
     return img
+
+def dilate(img, width=5, height=5, iterations=1):
+    kernel = np.ones((width, height), np.uint8)
+    return cv2.dilate(img,kernel,iterations = iterations)
+
+def closing(img, width=5, height=5):
+    kernel = np.ones((width, height), np.uint8)
+    return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+

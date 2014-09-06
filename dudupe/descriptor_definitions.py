@@ -1,1 +1,139 @@
 __author__ = 'robdefeo'
+
+from improc.features.descriptor import ZernikeDescriptor
+
+def zernike_001():
+    return ZernikeDescriptor(
+        preprocess=True,
+        radius=1,
+        resize={"enabled": False, "width": 250, "height": 250},
+        grey={"enabled": True},
+        autocrop={"enabled": True},
+        outline_contour={"enabled": True},
+        add_border={"enabled": True, "color_value": 0, "border_size": 15,
+                    "fill_dimensions": True},
+        bitwise_info={"enabled": True},
+        thresh={"enabled": False},
+        scale_max={"enabled": True, "width": 250, "height": 250},
+        dilate={"enabled": True, "width": 7, "height": 7, "iterations": 1},
+        closing={"enabled": True, "width": 5, "height": 5},
+        canny={"enabled": True, "threshold1": 100, "threshold2": 200},
+        gaussian_blur={"enabled": True, "ksize_width": 5, "ksize_height": 5,
+                       "sigmaX": 0},
+        laplacian={"enabled": False}
+    )
+
+def zernike_002():
+    return ZernikeDescriptor(
+        preprocess=True,
+        radius=3,
+        resize={"enabled": False, "width": 250, "height": 250},
+        grey={"enabled": True},
+        autocrop={"enabled": True},
+        outline_contour={"enabled": True},
+        add_border={"enabled": True, "color_value": 0, "border_size": 15,
+                    "fill_dimensions": True},
+        bitwise_info={"enabled": True},
+        thresh={"enabled": False},
+        scale_max={"enabled": True, "width": 250, "height": 250},
+        dilate={"enabled": True, "width": 7, "height": 7, "iterations": 1},
+        closing={"enabled": True, "width": 5, "height": 5},
+        canny={"enabled": True, "threshold1": 100, "threshold2": 200},
+        gaussian_blur={"enabled": True, "ksize_width": 5, "ksize_height": 5,
+                       "sigmaX": 0},
+        laplacian={"enabled": False}
+    )
+
+def zernike_003():
+    return ZernikeDescriptor(
+        preprocess=True,
+        radius=11,
+        resize={"enabled": False, "width": 250, "height": 250},
+        grey={"enabled": True},
+        autocrop={"enabled": True},
+        outline_contour={"enabled": True},
+        add_border={"enabled": True, "color_value": 0, "border_size": 15,
+                    "fill_dimensions": True},
+        bitwise_info={"enabled": True},
+        thresh={"enabled": False},
+        scale_max={"enabled": True, "width": 250, "height": 250},
+        dilate={"enabled": True, "width": 7, "height": 7, "iterations": 1},
+        closing={"enabled": True, "width": 5, "height": 5},
+        canny={"enabled": True, "threshold1": 100, "threshold2": 200},
+        gaussian_blur={"enabled": True, "ksize_width": 5, "ksize_height": 5,
+                       "sigmaX": 0},
+        laplacian={"enabled": False}
+    )
+def zernike_004():
+    return ZernikeDescriptor(
+        preprocess=True,
+        radius=21,
+        resize={"enabled": False, "width": 250, "height": 250},
+        grey={"enabled": True},
+        autocrop={"enabled": True},
+        outline_contour={"enabled": True},
+        add_border={"enabled": True, "color_value": 0, "border_size": 15,
+                    "fill_dimensions": True},
+        bitwise_info={"enabled": True},
+        thresh={"enabled": False},
+        scale_max={"enabled": True, "width": 250, "height": 250},
+        dilate={"enabled": True, "width": 7, "height": 7, "iterations": 1},
+        closing={"enabled": True, "width": 5, "height": 5},
+        canny={"enabled": True, "threshold1": 100, "threshold2": 200},
+        gaussian_blur={"enabled": True, "ksize_width": 5, "ksize_height": 5,
+                       "sigmaX": 0},
+        laplacian={"enabled": False}
+    )
+
+def zernike_005():
+    return ZernikeDescriptor(
+        preprocess=True,
+        radius=42,
+        resize={"enabled": False, "width": 250, "height": 250},
+        grey={"enabled": True},
+        autocrop={"enabled": True},
+        outline_contour={"enabled": True},
+        add_border={"enabled": True, "color_value": 0, "border_size": 15,
+                    "fill_dimensions": True},
+        bitwise_info={"enabled": True},
+        thresh={"enabled": False},
+        scale_max={"enabled": True, "width": 250, "height": 250},
+        dilate={"enabled": True, "width": 7, "height": 7, "iterations": 1},
+        closing={"enabled": True, "width": 5, "height": 5},
+        canny={"enabled": True, "threshold1": 100, "threshold2": 200},
+        gaussian_blur={"enabled": True, "ksize_width": 5, "ksize_height": 5,
+                       "sigmaX": 0},
+        laplacian={"enabled": False}
+    )
+
+def zernike_006():
+    return ZernikeDescriptor(
+        preprocess=True,
+        radius=84,
+        resize={"enabled": False, "width": 250, "height": 250},
+        grey={"enabled": True},
+        autocrop={"enabled": True},
+        outline_contour={"enabled": True},
+        add_border={"enabled": True, "color_value": 0, "border_size": 15,
+                    "fill_dimensions": True},
+        bitwise_info={"enabled": True},
+        thresh={"enabled": False},
+        scale_max={"enabled": True, "width": 250, "height": 250},
+        dilate={"enabled": True, "width": 7, "height": 7, "iterations": 1},
+        closing={"enabled": True, "width": 5, "height": 5},
+        canny={"enabled": True, "threshold1": 100, "threshold2": 200},
+        gaussian_blur={"enabled": True, "ksize_width": 5, "ksize_height": 5,
+                       "sigmaX": 0},
+        laplacian={"enabled": False}
+
+    )
+
+dd = {
+    "zernike_001": "zernike_001",
+    "zernike_002": "zernike_002",
+    "zernike_003": "zernike_003",
+    "zernike_004": "zernike_004",
+    "zernike_005": "zernike_005",
+    "zernike_006": "zernike_006"
+
+}

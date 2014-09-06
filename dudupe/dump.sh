@@ -1,0 +1,1 @@
+mongoexport --host ec2-54-77-87-8.eu-west-1.compute.amazonaws.com -u prproc -p _Prproc7421 --db product_processing --collection product --out product_converse.json --query '{"attributes": {$elemMatch: {"_id.key": "converse"}}}'

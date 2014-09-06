@@ -1,0 +1,1 @@
+mongoimport --host localhost --username prproc --password jemboo --db product_processing --collection product_converse --file product_converse.json
