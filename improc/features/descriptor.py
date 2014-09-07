@@ -63,16 +63,65 @@ class HarlickDescriptor(FeatureDescriptor):
 
 
 class RgbHistogramDescriptor(FeatureDescriptor):
-    def __init__(self, preprocess=False, bins=[8, 8, 8], size=(250, 250)):
+    def __init__(
+            self,
+            preprocess=True,
+            bins=[8, 8, 8],
+            resize={"enabled": True, "width": 250, "height": 250},
+            grey={"enabled": False},
+            autocrop={"enabled": True},
+            gaussian_blur={"enabled": False, "ksize_width": 5,
+                           "ksize_height": 5, "sigmaX": 0},
+            median_blur={"enabled": False, "ksize": 5},
+            scale_max={"enabled": True, "width": 250, "height": 250},
+
+    ):
         self.name = "rgb_histogram"
         # store the number of bins the histogram will use
         self.properties["bins"] = bins
-        self.properties["size"] = size
+        self.properties["resize"] = resize
+        self.properties["grey"] = grey
+        self.properties["autocrop"] = autocrop
+        self.properties["scale_max"] = scale_max
+        self.properties["gaussian_blur"] = gaussian_blur
+        self.properties["median_blur"] = median_blur
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
         x = np.copy(img)
-        return cv2.resize(x, self.properties["size"])
+
+        if self.properties["autocrop"]["enabled"]:
+            x = preprocess.autocrop(x)
+
+        if x is None:
+            return None
+
+        x = preprocess.blur(
+            x,
+            gaussian_blur=self.properties["gaussian_blur"],
+            median_blur=self.properties["median_blur"]
+
+        )
+
+        if self.properties["grey"]["enabled"]:
+            x = preprocess.grey(x)
+
+        if self.properties["resize"]["enabled"]:
+            x = preprocess.resize(
+                x,
+                (
+                    self.properties["resize"]["width"],
+                    self.properties["resize"]["height"]
+                )
+            )
+        elif self.properties["scale_max"]["enabled"]:
+            x = preprocess.scale_max(
+                x,
+                self.properties["scale_max"]["width"],
+                self.properties["scale_max"]["height"]
+            )
+
+        return x
 
     def describe(self, img):
         start = time.time()

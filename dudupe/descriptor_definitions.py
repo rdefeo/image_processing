@@ -1,6 +1,6 @@
 __author__ = 'robdefeo'
 
-from improc.features.descriptor import ZernikeDescriptor, LinearBinaryPatternsDescriptor
+from improc.features.descriptor import ZernikeDescriptor, LinearBinaryPatternsDescriptor, RgbHistogramDescriptor
 
 def zernike_001():
     return ZernikeDescriptor(
@@ -242,6 +242,20 @@ def lbp_003():
 
     )
 
+def rgb_001():
+    return RgbHistogramDescriptor(
+            preprocess=True,
+            bins=[8, 8, 8],
+            resize={"enabled": False, "width": 250, "height": 250},
+            grey={"enabled": False},
+            autocrop={"enabled": True},
+            gaussian_blur={"enabled": False, "ksize_width": 5,
+                           "ksize_height": 5, "sigmaX": 0},
+            median_blur={"enabled": False, "ksize": 5},
+            scale_max={"enabled": True, "width": 250, "height": 250},
+    )
+
+
 dd = {
     # "zernike_001": "zernike_001",
     # "zernike_002": "zernike_002",
@@ -253,6 +267,7 @@ dd = {
     "zernike_008": "zernike_008",
     "lbp_001": "lbp_001",
     "lbp_002": "lbp_002",
-    "lbp_003": "lbp_003"
+    "lbp_003": "lbp_003",
+    "rgb_001": "rgb_001"
 
 }

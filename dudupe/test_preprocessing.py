@@ -37,7 +37,7 @@ def test_image_across_descriptor(image_fname):
         plt.title("%s_%s" % (key[0], image_fname))
 
 
-test_descriptor_preprocessing_across_images("lbp_003")
+test_descriptor_preprocessing_across_images("rgb_001")
 
 # test_descriptor_preprocessing_image("zernike_006", samples_info[3])
 

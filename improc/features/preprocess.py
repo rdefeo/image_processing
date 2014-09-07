@@ -97,6 +97,7 @@ def bitwise(img):
     return cv2.bitwise_not(img)
 
 def laplacian(img):
+    # edge detection
     return cv2.Laplacian(img,cv2.CV_64F)
 
 def thresh(img):
