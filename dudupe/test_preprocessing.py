@@ -10,8 +10,10 @@ from improc.features.comparator import ChiSquaredComparator, \
 
 def test_descriptor_preprocessing_across_image(i, key, x):
     img = cv2.imread(x["sample_name"])
-    preprocessed = dd[key].do_preprocess(img)
-    # cv2.imshow("orig_%s_%s" % (key, x["sample_name"]), img)
+    methodToCall = getattr(descriptor_definitions, key)
+    descriptor = methodToCall()
+    preprocessed = descriptor.do_preprocess(img)
+
     plt.subplot(2, 3, i + 1),plt.imshow(preprocessed, 'gray')
     plt.title("%s_%s" % (key[0], x["sample_name"]))
 
@@ -35,10 +37,11 @@ def test_image_across_descriptor(image_fname):
         plt.title("%s_%s" % (key[0], image_fname))
 
 
-# test_descriptor_preprocessing_across_images("zernike_006")
+test_descriptor_preprocessing_across_images("lbp_001")
+
 # test_descriptor_preprocessing_image("zernike_006", samples_info[3])
 
-test_image_across_descriptor("samples/sarenza/test_1_0_0_90.jpg")
+# test_image_across_descriptor("samples/sarenza/test_1_0_0_90.jpg")
 
 
 plt.show()
