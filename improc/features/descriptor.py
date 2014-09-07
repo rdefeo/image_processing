@@ -7,7 +7,7 @@ import cv2
 import mahotas.features
 import numpy as np
 import preprocess
-# from preprocess import grey, autocrop, resize, add_border, outline_contour, thresh, bitwise, scale_max, canny, gaussian_blur
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -116,6 +116,7 @@ class ZernikeDescriptor(FeatureDescriptor):
                  bitwise_info={"enabled": True},
                  thresh={"enabled": True},
                  gaussian_blur={"enabled": False, "ksize_width": 5, "ksize_height": 5, "sigmaX": 0},
+                 median_blur={"enabled": False, "ksize": 5},
                  scale_max={"enabled": True, "width": 250, "height": 250},
                  laplacian={"enabled": False}
     ):
@@ -131,6 +132,7 @@ class ZernikeDescriptor(FeatureDescriptor):
         self.properties["scale_max"] = scale_max
         self.properties["canny"] = canny
         self.properties["gaussian_blur"] = gaussian_blur
+        self.properties["median_blur"] = median_blur
         self.properties["laplacian"] = laplacian
         self.properties["dilate"] = dilate
         self.properties["closing"] = closing
@@ -145,15 +147,12 @@ class ZernikeDescriptor(FeatureDescriptor):
         if x is None:
             return None
 
-        if self.properties["gaussian_blur"]["enabled"]:
-            x = preprocess.gaussian_blur(
-                x,
-                (
-                    self.properties["gaussian_blur"]["ksize_width"],
-                    self.properties["gaussian_blur"]["ksize_height"]
-                ),
-                self.properties["gaussian_blur"]["sigmaX"]
-            )
+        x = preprocess.blur(
+            x,
+            gaussian_blur=self.properties["gaussian_blur"],
+            median_blur=self.properties["median_blur"]
+
+        )
 
         if self.properties["grey"]["enabled"]:
             x = preprocess.grey(x)
@@ -257,6 +256,7 @@ class LinearBinaryPatternsDescriptor(FeatureDescriptor):
                  bitwise_info={"enabled": True},
                  thresh={"enabled": True},
                  gaussian_blur={"enabled": False, "ksize_width": 5, "ksize_height": 5, "sigmaX": 0},
+                 median_blur={"enabled": False, "ksize": 5},
                  scale_max={"enabled": True, "width": 250, "height": 250},
                  laplacian={"enabled": False}
     ):
@@ -275,6 +275,7 @@ class LinearBinaryPatternsDescriptor(FeatureDescriptor):
         self.properties["scale_max"] = scale_max
         self.properties["canny"] = canny
         self.properties["gaussian_blur"] = gaussian_blur
+        self.properties["median_blur"] = median_blur
         self.properties["laplacian"] = laplacian
         self.properties["dilate"] = dilate
         self.properties["closing"] = closing
@@ -289,15 +290,11 @@ class LinearBinaryPatternsDescriptor(FeatureDescriptor):
         if x is None:
             return None
 
-        if self.properties["gaussian_blur"]["enabled"]:
-            x = preprocess.gaussian_blur(
-                x,
-                (
-                    self.properties["gaussian_blur"]["ksize_width"],
-                    self.properties["gaussian_blur"]["ksize_height"]
-                ),
-                self.properties["gaussian_blur"]["sigmaX"]
-            )
+        x = preprocess.blur(
+            x,
+            gaussian_blur=self.properties["gaussian_blur"],
+            median_blur=self.properties["median_blur"]
+        )
 
         if self.properties["grey"]["enabled"]:
             x = preprocess.grey(x)

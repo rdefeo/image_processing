@@ -10,7 +10,7 @@ import cv2
 import descriptor_definitions
 from matplotlib import pyplot as plt
 
-def process_results(results, sample, key):
+def process_results(results, sample, key, descriptor):
     minimum = results["results"][0]["value"]
     maximum = results["results"][-1:][0]["value"]
     total_range = maximum - minimum
@@ -29,8 +29,11 @@ def process_results(results, sample, key):
               actual["norm"], len(results["results"])
     )
 
-    for x in results["results"][:15]:
-        # pass
+    top_results = 14
+    for i, x in enumerate(results["results"][:top_results]):
+        # img = cv2.imread("data/%s.jpg" % x["key"])
+        # plt.subplot(5, 3, i), plt.imshow(descriptor.do_preprocess(img),"%s_%s" %  (sample["name"], key))
+        # plt.title("%s" % (x["norm"]))
         print x
 
 def load_dataset(fname, sample):
@@ -67,7 +70,7 @@ def test_dataset(key, total):
         res = do(sample_description, descriptor_info["data"],
                  EuclideanComparator())
 
-        process_results(res, x, key)
+        process_results(res, x, key, descriptor)
 
     return i + total
 
@@ -77,6 +80,7 @@ def test_datasets():
     for key in dd.keys():
         total = test_dataset(key, total + 1)
 
-# test_datasets()
-test_dataset("zernike_007", 0)
+test_datasets()
+# test_dataset("zernike_007", 0)
+# test_dataset("lbp_001", 0)
 plt.show()

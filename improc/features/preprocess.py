@@ -6,6 +6,28 @@ from improc.shape import ScaleMax, ScaleHeight, ScaleWidth
 from skimage import filter
 from skimage import measure
 import numpy as np
+import improc.smooth
+
+
+def blur(img, gaussian_blur=None, median_blur=None):
+    x = np.copy(img)
+    if gaussian_blur is not None and gaussian_blur["enabled"]:
+        x = improc.smooth.gaussian_blur(
+            x,
+            (
+                gaussian_blur["ksize_width"],
+                gaussian_blur["ksize_height"]
+            ),
+            gaussian_blur["sigmaX"]
+        )
+
+    if median_blur is not None and median_blur["enabled"]:
+        x = improc.smooth.median_blur(
+            x,
+            median_blur["ksize"]
+        )
+
+    return x
 
 def scale_max(img, width=250, height=250):
     return ScaleMax(img, width, height)
@@ -73,9 +95,6 @@ def canny(img, threshold1=100, threshold2=200):
 
 def bitwise(img):
     return cv2.bitwise_not(img)
-
-def gaussian_blur(img, ksize=(5, 5), sigmaX=0):
-    return cv2.GaussianBlur(img, ksize, sigmaX)
 
 def laplacian(img):
     return cv2.Laplacian(img,cv2.CV_64F)
