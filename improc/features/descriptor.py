@@ -7,6 +7,7 @@ import cv2
 import mahotas.features
 import numpy as np
 import preprocess
+import improc.color
 
 
 LOGGER = logging.getLogger(__name__)
@@ -74,6 +75,7 @@ class RgbHistogramDescriptor(FeatureDescriptor):
                            "ksize_height": 5, "sigmaX": 0},
             median_blur={"enabled": False, "ksize": 5},
             scale_max={"enabled": True, "width": 250, "height": 250},
+            convert_to_matrix_colors={"enabled": False, "height": 1, "width": 1000, "number_of_colors": 5}
 
     ):
         self.name = "rgb_histogram"
@@ -85,6 +87,8 @@ class RgbHistogramDescriptor(FeatureDescriptor):
         self.properties["scale_max"] = scale_max
         self.properties["gaussian_blur"] = gaussian_blur
         self.properties["median_blur"] = median_blur
+        self.properties["convert_to_matrix_colors"] = convert_to_matrix_colors
+
         self.preprocess = preprocess
 
     def do_preprocess(self, img):
@@ -121,6 +125,19 @@ class RgbHistogramDescriptor(FeatureDescriptor):
                 self.properties["scale_max"]["height"]
             )
 
+        if self.properties["convert_to_matrix_colors"]["enabled"]:
+            (
+                matrix, cluster_centers_, labels, background_label
+            ) = improc.color.Matrix_scikit_kmeans(
+                x,
+                self.properties["convert_to_matrix_colors"]["number_of_colors"]
+            )
+            x = improc.color.Image_from_matrix(
+                matrix,
+                self.properties["convert_to_matrix_colors"]["height"],
+                self.properties["convert_to_matrix_colors"]["width"]
+            )
+
         return x
 
     def describe(self, img):
@@ -128,17 +145,31 @@ class RgbHistogramDescriptor(FeatureDescriptor):
         x = img
         if self.preprocess:
             x = self.do_preprocess(img)
+            if x is None:
+                return None
+
+
         # compute a 3D histogram in the RGB colorspace,
         # then normalize the histogram so that images
         # with the same content, but either scaled larger
         # or smaller will have (roughly) the same histogram
-        hist = cv2.calcHist(
-            [x],
-            [0, 1, 2],
-            None,
-            self.properties["bins"],
-            [0, 256, 0, 256, 0, 256]
-        )
+        if self.properties["grey"]["enabled"]:
+            hist = cv2.calcHist(
+                [x],
+                [0],
+                None,
+                [self.properties["bins"][0]],
+                [0,256]
+            )
+        else:
+            hist = cv2.calcHist(
+                [x],
+                [0, 1, 2],
+                None,
+                self.properties["bins"],
+                [0, 256, 0, 256, 0, 256]
+            )
+
         hist = cv2.normalize(hist)
 
         # return out 3D histogram as a flattened array
@@ -309,7 +340,7 @@ class LinearBinaryPatternsDescriptor(FeatureDescriptor):
                  scale_max={"enabled": True, "width": 250, "height": 250},
                  laplacian={"enabled": False}
     ):
-        self.name = "zernike"
+        self.name = "linear_binary_patterns"
         self.properties["radius"] = radius
         self.properties["number_of_points"] = number_of_points
         self.properties["ignore_zeros"] = ignore_zeros

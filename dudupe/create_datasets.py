@@ -21,13 +21,14 @@ def create_ds(key):
         img = cv2.imread(path)
         # i = descriptor.do_preprocess(img)
         # cv2.imshow("test", i)
+        print "fname=%s" % fname
 
         description = descriptor.describe(img)
         if description is not None:
             description["value"] = description["value"].tolist()
             data[fname[:-4]] = description
 
-        print "fname=%s" % fname
+
 
     descriptor_data["data"] = data
     descriptor_fname = "datasets/%s" % (key)

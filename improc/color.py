@@ -1,5 +1,7 @@
 import logging
 from time import time
+import cv2
+import operator
 
 import numpy as np
 
@@ -132,9 +134,14 @@ def Reduce_scikit_kmeans(img, number_of_colors):
     assert d == 3
     image_array = np.reshape(img_64, (w * h, d))
 
+    LOGGER.info("shape=%s", image_array.shape)
     from sklearn.utils import resample
     image_array_sample = resample(
-        image_array, replace=True, n_samples=1000, random_state=1)
+        image_array,
+        replace=True,
+        n_samples=min([image_array.shape[0], 1000]),
+        random_state=1
+    )
 
     kmeans = KMeans(
         n_clusters=number_of_colors,
@@ -153,3 +160,29 @@ def Hex_from_array(rgb):
 
 def Hex(r, g, b):
     return '0x%02x%02x%02x' % (r, g, b)
+
+
+def Image_from_matrix(matrix, height=150, width=1000):
+    # initialize the bar chart representing the relative frequency
+    # of each of the colors
+
+    bar = np.zeros((height, width, 3), dtype="uint8")
+    startX = 0
+
+    sorted_values = sorted(matrix["values"], key=operator.itemgetter("percent"),
+                           reverse=True)
+
+    for value in sorted_values:
+        percent = value["percent"]
+        color = np.array(value["rgb"])
+        endX = startX + (percent * width)
+        cv2.rectangle(
+            bar,
+            (int(startX), 0),
+            (int(endX), height),
+            color.astype("uint8").tolist(),
+            -1
+        )
+        startX = endX
+
+    return bar

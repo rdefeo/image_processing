@@ -2,6 +2,30 @@ __author__ = 'robdefeo'
 
 from improc.features.descriptor import ZernikeDescriptor, LinearBinaryPatternsDescriptor, RgbHistogramDescriptor
 
+def test():
+    return LinearBinaryPatternsDescriptor(
+        preprocess=True,
+        radius=84,
+        number_of_points=10,
+        ignore_zeros=False,
+        resize={"enabled": False, "width": 250, "height": 250},
+        grey={"enabled": True},
+        autocrop={"enabled": True},
+        outline_contour={"enabled": True},
+        add_border={"enabled": True, "color_value": 0, "border_size": 15,
+                    "fill_dimensions": False},
+        bitwise_info={"enabled": True},
+        thresh={"enabled": True},
+        scale_max={"enabled": True, "width": 500, "height": 500},
+        dilate={"enabled": True, "width": 7, "height": 7, "iterations": 1},
+        closing={"enabled": True, "width": 5, "height": 5},
+        canny={"enabled": True, "threshold1": 100, "threshold2": 200},
+        gaussian_blur={"enabled": True, "ksize_width": 5, "ksize_height": 5,
+                       "sigmaX": 0},
+        laplacian={"enabled": False}
+
+    )
+
 def zernike_001():
     return ZernikeDescriptor(
         preprocess=True,
@@ -255,6 +279,51 @@ def rgb_001():
             scale_max={"enabled": True, "width": 250, "height": 250},
     )
 
+def rgb_002():
+    return RgbHistogramDescriptor(
+            preprocess=True,
+            bins=[8, 8, 8],
+            resize={"enabled": False, "width": 250, "height": 250},
+            grey={"enabled": True},
+            autocrop={"enabled": True},
+            gaussian_blur={"enabled": False, "ksize_width": 5,
+                           "ksize_height": 5, "sigmaX": 0},
+            median_blur={"enabled": False, "ksize": 5},
+            scale_max={"enabled": True, "width": 250, "height": 250},
+    )
+
+def rgb_003():
+    return RgbHistogramDescriptor(
+            preprocess=True,
+            bins=[8, 8, 8],
+            resize={"enabled": False, "width": 250, "height": 250},
+            grey={"enabled": False},
+            autocrop={"enabled": True},
+            gaussian_blur={"enabled": False, "ksize_width": 5,
+                           "ksize_height": 5, "sigmaX": 0},
+            median_blur={"enabled": False, "ksize": 5},
+            scale_max={"enabled": True, "width": 250, "height": 250},
+            convert_to_matrix_colors={"enabled": True, "height": 300,
+                                      "width": 1000, "number_of_colors": 5},
+    )
+
+def rgb_004():
+    return RgbHistogramDescriptor(
+            preprocess=True,
+            bins=[8, 8, 8],
+            resize={"enabled": False, "width": 250, "height": 250},
+            grey={"enabled": True},
+            autocrop={"enabled": True},
+            gaussian_blur={"enabled": False, "ksize_width": 5,
+                           "ksize_height": 5, "sigmaX": 0},
+            median_blur={"enabled": False, "ksize": 5},
+            scale_max={"enabled": True, "width": 250, "height": 250},
+            convert_to_matrix_colors={"enabled": True, "height": 300,
+                                      "width": 1000, "number_of_colors": 5},
+    )
+
+
+
 
 dd = {
     # "zernike_001": "zernike_001",
@@ -268,6 +337,9 @@ dd = {
     "lbp_001": "lbp_001",
     "lbp_002": "lbp_002",
     "lbp_003": "lbp_003",
-    "rgb_001": "rgb_001"
-
+    "rgb_001": "rgb_001",
+    "rgb_002": "rgb_002",
+    # "rgb_003": "rgb_003",
+    # "rgb_004": "rgb_004",
+    "test": "test",
 }

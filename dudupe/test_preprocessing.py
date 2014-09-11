@@ -13,7 +13,7 @@ def test_descriptor_preprocessing_across_image(i, key, x):
     methodToCall = getattr(descriptor_definitions, key)
     descriptor = methodToCall()
     preprocessed = descriptor.do_preprocess(img)
-    # description = descriptor.describe(img)
+    description = descriptor.describe(img)
     plt.subplot(2, 3, i + 1),plt.imshow(preprocessed, 'gray')
     plt.title("%s_%s" % (key[0], x["sample_name"]))
 
@@ -37,7 +37,7 @@ def test_image_across_descriptor(image_fname):
         plt.title("%s_%s" % (key[0], image_fname))
 
 
-test_descriptor_preprocessing_across_images("rgb_001")
+test_descriptor_preprocessing_across_images("test")
 
 # test_descriptor_preprocessing_image("zernike_006", samples_info[3])
 
