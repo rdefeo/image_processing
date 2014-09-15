@@ -221,47 +221,43 @@ class ZernikeDescriptor(FeatureDescriptor):
 
     def do_preprocess(self, img):
         x = np.copy(img)
-        if self.properties["autocrop"]["enabled"]:
+        if x is not None and self.properties["autocrop"]["enabled"]:
             x = preprocess.autocrop(x)
 
-        if x is None:
-            return None
+        if x is not None:
+            x = preprocess.blur(
+                x,
+                gaussian_blur=self.properties["gaussian_blur"],
+                median_blur=self.properties["median_blur"]
+            )
 
-        x = preprocess.blur(
-            x,
-            gaussian_blur=self.properties["gaussian_blur"],
-            median_blur=self.properties["median_blur"]
-
-        )
-
-        if self.properties["grey"]["enabled"]:
+        if x is not None and self.properties["grey"]["enabled"]:
             x = preprocess.grey(x)
 
-        if self.properties["bitwise"]["enabled"]:
+        if x is not None and self.properties["bitwise"]["enabled"]:
             x = preprocess.bitwise(x)
 
-
-        if self.properties["canny"]["enabled"]:
+        if x is not None and self.properties["canny"]["enabled"]:
             x = preprocess.canny(
                 x,
                 self.properties["canny"]["threshold1"],
                 self.properties["canny"]["threshold2"]
             )
 
-        if self.properties["laplacian"]["enabled"]:
+        if x is not None and self.properties["laplacian"]["enabled"]:
             x = preprocess.laplacian(x)
 
-        if self.properties["thresh"]["enabled"]:
+        if x is not None and self.properties["thresh"]["enabled"]:
             x = preprocess.thresh(x)
 
-        if self.properties["closing"]["enabled"]:
+        if x is not None and self.properties["closing"]["enabled"]:
             x = preprocess.closing(
                 x,
                 self.properties["closing"]["width"],
                 self.properties["closing"]["height"]
             )
 
-        if self.properties["dilate"]["enabled"]:
+        if x is not None and self.properties["dilate"]["enabled"]:
             x = preprocess.dilate(
                 x,
                 self.properties["dilate"]["width"],
@@ -269,11 +265,10 @@ class ZernikeDescriptor(FeatureDescriptor):
                 self.properties["dilate"]["iterations"]
             )
 
-        if self.properties["outline_contour"]["enabled"]:
+        if x is not None and self.properties["outline_contour"]["enabled"]:
             x = preprocess.outline_contour(x)
 
-
-        if self.properties["resize"]["enabled"]:
+        if x is not None and self.properties["resize"]["enabled"]:
             x = preprocess.resize(
                 x,
                 (
@@ -281,14 +276,14 @@ class ZernikeDescriptor(FeatureDescriptor):
                     self.properties["resize"]["height"]
                 )
             )
-        elif self.properties["scale_max"]["enabled"]:
+        elif x is not None and self.properties["scale_max"]["enabled"]:
             x = preprocess.scale_max(
                 x,
                 self.properties["scale_max"]["width"],
                 self.properties["scale_max"]["height"]
             )
 
-        if self.properties["add_border"]["enabled"]:
+        if x is not None and self.properties["add_border"]["enabled"]:
             x = preprocess.add_border(
                 x,
                 border_size=self.properties["add_border"]["border_size"],
@@ -364,46 +359,43 @@ class LinearBinaryPatternsDescriptor(FeatureDescriptor):
 
     def do_preprocess(self, img):
         x = np.copy(img)
-        if self.properties["autocrop"]["enabled"]:
+        if x is not None and self.properties["autocrop"]["enabled"]:
             x = preprocess.autocrop(x)
 
-        if x is None:
-            return None
+        if x is not None:
+            x = preprocess.blur(
+                x,
+                gaussian_blur=self.properties["gaussian_blur"],
+                median_blur=self.properties["median_blur"]
+            )
 
-        x = preprocess.blur(
-            x,
-            gaussian_blur=self.properties["gaussian_blur"],
-            median_blur=self.properties["median_blur"]
-        )
-
-        if self.properties["grey"]["enabled"]:
+        if x is not None and self.properties["grey"]["enabled"]:
             x = preprocess.grey(x)
 
-        if self.properties["bitwise"]["enabled"]:
+        if x is not None and self.properties["bitwise"]["enabled"]:
             x = preprocess.bitwise(x)
 
-
-        if self.properties["canny"]["enabled"]:
+        if x is not None and self.properties["canny"]["enabled"]:
             x = preprocess.canny(
                 x,
                 self.properties["canny"]["threshold1"],
                 self.properties["canny"]["threshold2"]
             )
 
-        if self.properties["laplacian"]["enabled"]:
+        if x is not None and self.properties["laplacian"]["enabled"]:
             x = preprocess.laplacian(x)
 
-        if self.properties["thresh"]["enabled"]:
+        if x is not None and self.properties["thresh"]["enabled"]:
             x = preprocess.thresh(x)
 
-        if self.properties["closing"]["enabled"]:
+        if x is not None and self.properties["closing"]["enabled"]:
             x = preprocess.closing(
                 x,
                 self.properties["closing"]["width"],
                 self.properties["closing"]["height"]
             )
 
-        if self.properties["dilate"]["enabled"]:
+        if x is not None and self.properties["dilate"]["enabled"]:
             x = preprocess.dilate(
                 x,
                 self.properties["dilate"]["width"],
@@ -411,11 +403,10 @@ class LinearBinaryPatternsDescriptor(FeatureDescriptor):
                 self.properties["dilate"]["iterations"]
             )
 
-        if self.properties["outline_contour"]["enabled"]:
+        if x is not None and self.properties["outline_contour"]["enabled"]:
             x = preprocess.outline_contour(x)
 
-
-        if self.properties["resize"]["enabled"]:
+        if x is not None and self.properties["resize"]["enabled"]:
             x = preprocess.resize(
                 x,
                 (
@@ -423,14 +414,14 @@ class LinearBinaryPatternsDescriptor(FeatureDescriptor):
                     self.properties["resize"]["height"]
                 )
             )
-        elif self.properties["scale_max"]["enabled"]:
+        elif x is not None and self.properties["scale_max"]["enabled"]:
             x = preprocess.scale_max(
                 x,
                 self.properties["scale_max"]["width"],
                 self.properties["scale_max"]["height"]
             )
 
-        if self.properties["add_border"]["enabled"]:
+        if x is not None and self.properties["add_border"]["enabled"]:
             x = preprocess.add_border(
                 x,
                 border_size=self.properties["add_border"]["border_size"],

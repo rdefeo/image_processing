@@ -85,10 +85,14 @@ def outline_contour(img):
         cv2.CHAIN_APPROX_SIMPLE
     )
 
-    cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[0]
-    cv2.drawContours(outline, [cnts], -1, 255, -1)
+    if len(cnts) > 0:
+        cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[0]
 
-    return outline
+        cv2.drawContours(outline, [cnts], -1, 255, -1)
+
+        return outline
+    else:
+        return None
 
 def canny(img, threshold1=100, threshold2=200):
     return cv2.Canny(img, threshold1, threshold2)
