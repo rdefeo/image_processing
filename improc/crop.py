@@ -22,6 +22,7 @@ def AutoCrop(original_image, labels, background_label):
     # uses the outputs from Matrix_scikit_kmeans to get work with
     top_left_pixel = original_image[0][0]
     if not IsWhiteish(top_left_pixel):
+        LOGGER.warn("top left pixel is not whiteish,function=autocrop")
         return None, None, None, None, None
 
     reshaped_labels = labels.reshape(
@@ -30,13 +31,17 @@ def AutoCrop(original_image, labels, background_label):
 
     bounding_box = np.argwhere(reshaped_labels != background_label)
     if len(bounding_box) == 0:
+        LOGGER.warn("no bounding box found after reshaping,function=autocrop")
         return None, None, None, None, None
         
     (ystart, xstart) = bounding_box.min(0) - 1
     (ystop, xstop) = bounding_box.max(0) + 1
+    ystart = max(ystart, 0)
+    xstart = max(xstart, 0)
 
     bounding_box_image = original_image[ystart:ystop, xstart:xstop]
-    if len(bounding_box_image) == 0:
+    if len(bounding_box_image) == 0 or len(bounding_box_image[0]) == 0:
+        LOGGER.warn("bounding box image empty after crop,function=autocrop")
         return None, None, None, None, None
 
     top_left_pixel_bounding_box = bounding_box_image[0][0]
@@ -46,9 +51,10 @@ def AutoCrop(original_image, labels, background_label):
         not IsWhiteish(top_left_pixel_bounding_box) or
         not IsWhiteish(bottom_right_pixel_bounding_box)
     ):
+        LOGGER.warn("top left or bottom right pixel is not whiteish after crop,function=autocrop")
         return None, None, None, None, None
 
-    LOGGER.info('ms=%s' % (ms(start)))
+    LOGGER.info('function=autocrop,ms=%s' % (ms(start)))
 
     return bounding_box_image, xstart, ystart, xstop - xstart, ystop - ystart
     # return cropped_image, x, y, width, height
