@@ -13,6 +13,7 @@ setup(
         'mahotas==1.2.1',
         # scipy>=0.11 cant be done on ubuntu
         'scikit-learn>=0.15.0',
+        'scikit-image>=0.10.1'
     ]
     # long_description=open('README.txt').read(),
 )
