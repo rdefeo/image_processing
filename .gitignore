@@ -4,3 +4,4 @@ other
 */build
 *.pyc
 build
+/.idea

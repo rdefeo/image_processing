@@ -22,7 +22,7 @@ def AutoCrop(original_image, labels, background_label):
     # uses the outputs from Matrix_scikit_kmeans to get work with
     top_left_pixel = original_image[0][0]
     if not IsWhiteish(top_left_pixel):
-        LOGGER.warn("top left pixel is not whiteish,function=autocrop")
+        LOGGER.warn("top left pixel is not whiteish,function=autocrop,top_left_pixel=%s", top_left_pixel)
         return None, None, None, None, None
 
     reshaped_labels = labels.reshape(
