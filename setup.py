@@ -1,4 +1,9 @@
 from distutils.core import setup
+import os
+from setuptools import setup
+
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
 
 setup(
     name='image_processing',
@@ -7,13 +12,6 @@ setup(
       'improc',
       'improc.features',
     ],
-    install_requires=[
-        'numpy>=1.8.1',
-        'matplotlib==1.1.1',
-        'mahotas==1.2.1',
-        # scipy>=0.11 cant be done on ubuntu
-        'scikit-learn>=0.15.0',
-        'scikit-image>=0.10.1'
-    ]
+    install_requires=required
     # long_description=open('README.txt').read(),
 )
