@@ -1,6 +1,6 @@
 # do it in the chef scripts instead numpy>=1.9.1
 #matplotlib==1.1.1
-mahotas==1.2.1
+#mahotas==1.2.1
 #scipy>=0.11 cant be done on ubuntu
 
 #scikit-learn>=0.15.0
