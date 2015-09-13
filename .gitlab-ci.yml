@@ -1,0 +1,14 @@
+test:
+  script:
+  - apt-get update -qy
+  - apt-get install -y python-dev python-pip
+  - pip install numpy
+  - pip install scikit-learn
+  - pip install scipy
+  - pip install sklearn
+  - pip install -r requirements.txt
+  - apt-get install libjpeg libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
+  - pip install PIL
+  - pip install pytest
+  - pip install pytest-cov
+  - python -m pytest --cov=improc
