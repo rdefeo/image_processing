@@ -2,7 +2,7 @@ test:
   script:
   - apt-get update -qy
   - apt-get install -y python-dev python-pip
-  - apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+  - apt-get install -q -y python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
   - pip install scikit-learn
   - pip install sklearn
   - pip install -r requirements.txt
