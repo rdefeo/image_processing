@@ -2,9 +2,8 @@ test:
   script:
   - apt-get update -qy
   - apt-get install -y python-dev python-pip
-  - pip install numpy
+  - apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
   - pip install scikit-learn
-  - pip install scipy
   - pip install sklearn
   - pip install -r requirements.txt
   - apt-get install libjpeg libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
