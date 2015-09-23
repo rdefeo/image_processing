@@ -168,11 +168,10 @@ def Hex(r, g, b):
 
 
 def Image_from_matrix(matrix, height=150, width=1000):
-    import cv2
     # initialize the bar chart representing the relative frequency
     # of each of the colors
 
-    bar = np.zeros((height, width, 3), dtype="uint8")
+    image = np.zeros((height, width, 3), dtype="uint8")
     startX = 0
 
     sorted_values = sorted(matrix["values"], key=operator.itemgetter("percent"),
@@ -182,16 +181,10 @@ def Image_from_matrix(matrix, height=150, width=1000):
         percent = value["percent"]
         color = np.array(value["rgb"])
         endX = startX + (percent * width)
-        cv2.rectangle(
-            bar,
-            (int(startX), 0),
-            (int(endX), height),
-            color.astype("uint8").tolist(),
-            -1
-        )
+        image[:,startX:endX][:,:,:3] = color
         startX = endX
 
-    return bar
+    return image
 
 
 def hex_to_rgb(hex_code):
