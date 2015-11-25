@@ -1,9 +1,9 @@
 from improc import color
+from scipy.ndimage import imread
+import matplotlib.pyplot as plt
 
 __author__ = 'robdefeo'
 
-from scipy.ndimage import imread
-import matplotlib.pyplot as plt
 
 def plot_image_bar(file):
     image = imread(file)
@@ -16,7 +16,6 @@ def plot_image_bar(file):
 
     img = color.Image_from_matrix(matrix)
 
-
     plt.imshow(img)
     plt.show()
 
@@ -24,5 +23,6 @@ plot_image_bar('../../tests/data/color/red_1.jpg')
 plot_image_bar('../../tests/data/color/red_2.jpg')
 plot_image_bar('../../tests/data/color/red_3.jpg')
 plot_image_bar('../../tests/data/color/red_4.jpg')
+plot_image_bar('/home/alessio/Desktop/shoe.jpg')
 
 pass

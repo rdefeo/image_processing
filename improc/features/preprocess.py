@@ -3,8 +3,9 @@ import cv2
 from improc.color import Matrix_scikit_kmeans
 from improc.crop import AutoCrop
 from improc.shape import ScaleMax, ScaleHeight, ScaleWidth
-from skimage import filter
+from skimage import filters
 from skimage import measure
+from skimage.color import rgb2gray
 import numpy as np
 import improc.smooth
 
@@ -33,7 +34,7 @@ def scale_max(img, width=250, height=250):
     return ScaleMax(img, width, height)
 
 def grey(img):
-    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return rgb2gray(img)
 
 def autocrop(img):
     (
@@ -80,7 +81,7 @@ def add_border(img, color_value=255, width=250, height=250, border_size=15, fill
 
 def outline_contour(img):
     outline = np.zeros(img.shape, dtype="uint8")
-    (cnts, _) = cv2.findContours(
+    (_, cnts, _) = cv2.findContours(
         img.copy(), cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
     )
