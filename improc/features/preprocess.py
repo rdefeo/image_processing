@@ -2,7 +2,7 @@ __author__ = 'robdefeo'
 import cv2
 from improc.color import Matrix_scikit_kmeans
 from improc.crop import AutoCrop
-from improc.shape import ScaleMax, ScaleHeight, ScaleWidth
+from improc.shape import ScaleMax, ScaleHeight, ScaleWidth, MakeSquare
 from skimage import filters
 from skimage import measure
 from skimage import feature
@@ -36,6 +36,7 @@ def blur(img, gaussian_blur=None, median_blur=None):
 
 def scale_max(img, width=250, height=250):
     return ScaleMax(img, width, height)
+
 
 def make_square(img):
     return MakeSquare(img)
