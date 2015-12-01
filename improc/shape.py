@@ -47,3 +47,27 @@ def ScaleWidth(img, width):
         resized.shape[1], resized.shape[0]
     )
     return resized
+
+
+def MakeSquare(img):
+    '''Make an image square by adding white pixels to the smaller dimension,
+    It keeps the original image centered'''
+    img_size = max(img.shape[1], img.shape[0])
+    whitebar_size = (img_size - min(img.shape[1], img.shape[0]))/2
+    resized = img
+
+    if img.shape[0] > img.shape[1]:
+        whitebar = np.ones((img_size, whitebar_size, 3))*255
+        resized = np.concatenate((whitebar, img, whitebar), axis=1)
+
+        if resized.shape[0] - resized.shape[1] == 1:
+            resized = np.concatenate((resized, np.ones((img_size, 1, 3))*255), axis=1)
+
+    if img.shape[0] < img.shape[1]:
+        whitebar = np.ones((whitebar_size, img_size, 3))*255
+        resized = np.concatenate((whitebar, img, whitebar), axis=0)
+
+        if resized.shape[1] - resized.shape[0] == 1:
+            resized = np.concatenate((resized, np.ones((1, img_size, 3))*255), axis=0)
+
+    return resized
