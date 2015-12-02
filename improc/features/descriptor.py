@@ -198,12 +198,14 @@ class ZernikeDescriptor(FeatureDescriptor):
                  gaussian_blur={"enabled": False, "ksize_width": 5, "ksize_height": 5, "sigmaX": 0},
                  median_blur={"enabled": False, "ksize": 5},
                  scale_max={"enabled": True, "width": 250, "height": 250},
+                 square={"enabled": True},
                  laplacian={"enabled": False}
     ):
         self.name = "zernike"
         self.properties["radius"] = radius
         self.properties["resize"] = resize
         self.properties["grey"] = grey
+        self.properties["square"] = square
         self.properties["autocrop"] = autocrop
         self.properties["add_border"] = add_border
         self.properties["outline_contour"] = outline_contour
@@ -223,6 +225,12 @@ class ZernikeDescriptor(FeatureDescriptor):
         x = np.copy(img)
         if x is not None and self.properties["autocrop"]["enabled"]:
             x = preprocess.autocrop(x)
+
+        if x is not None and self.properties["square"]["enabled"]:
+            x = preprocess.make_square(x)
+
+        msg = "square dim: " + str(x.shape)
+        print msg
 
         if x is not None:
             x = preprocess.blur(
@@ -282,14 +290,15 @@ class ZernikeDescriptor(FeatureDescriptor):
                 self.properties["scale_max"]["width"],
                 self.properties["scale_max"]["height"]
             )
-
-        if x is not None and self.properties["add_border"]["enabled"]:
-            x = preprocess.add_border(
-                x,
-                border_size=self.properties["add_border"]["border_size"],
-                color_value=self.properties["add_border"]["color_value"],
-                fill_dimensions=self.properties["add_border"]["fill_dimensions"]
-            )
+        msg = "scale_max dim: " + str(x.shape)
+        print msg
+        # if x is not None and self.properties["add_border"]["enabled"]:
+        #     x = preprocess.add_border(
+        #         x,
+        #         border_size=self.properties["add_border"]["border_size"],
+        #         color_value=self.properties["add_border"]["color_value"],
+        #         fill_dimensions=self.properties["add_border"]["fill_dimensions"]
+        #     )
 
         return x
 

@@ -110,7 +110,7 @@ def outline_contour(img):
 
 def outline_contour(img):
     outline = np.zeros(img.shape, dtype="uint8")
-    (cnts, _) = cv2.findContours(
+    (_, cnts, _) = cv2.findContours(
         img.copy(), cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
     )
@@ -126,6 +126,7 @@ def outline_contour(img):
 
 
 def canny(img, threshold1=100, threshold2=200):
+    img = np.uint8(img)
     return cv2.Canny(img, threshold1, threshold2)
 
 
