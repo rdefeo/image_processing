@@ -232,14 +232,9 @@ class ZernikeDescriptor(FeatureDescriptor):
                 self.properties["scale_max"]["width"],
                 self.properties["scale_max"]["height"]
             )
-        msg = "scale_max dim: " + str(x.shape) # here is wrong
-        print msg
 
         if x is not None and self.properties["square"]["enabled"]:
             x = preprocess.make_square(x)
-
-        msg = "square dim: " + str(x.shape) # here is correct
-        print msg
 
         if x is not None:
             x = preprocess.blur(
