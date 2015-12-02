@@ -226,10 +226,19 @@ class ZernikeDescriptor(FeatureDescriptor):
         if x is not None and self.properties["autocrop"]["enabled"]:
             x = preprocess.autocrop(x)
 
+        if x is not None and self.properties["scale_max"]["enabled"]:
+            x = preprocess.scale_max(
+                x,
+                self.properties["scale_max"]["width"],
+                self.properties["scale_max"]["height"]
+            )
+        msg = "scale_max dim: " + str(x.shape) # here is wrong
+        print msg
+
         if x is not None and self.properties["square"]["enabled"]:
             x = preprocess.make_square(x)
 
-        msg = "square dim: " + str(x.shape)
+        msg = "square dim: " + str(x.shape) # here is correct
         print msg
 
         if x is not None:
@@ -284,14 +293,7 @@ class ZernikeDescriptor(FeatureDescriptor):
                     self.properties["resize"]["height"]
                 )
             )
-        elif x is not None and self.properties["scale_max"]["enabled"]:
-            x = preprocess.scale_max(
-                x,
-                self.properties["scale_max"]["width"],
-                self.properties["scale_max"]["height"]
-            )
-        msg = "scale_max dim: " + str(x.shape)
-        print msg
+
         # if x is not None and self.properties["add_border"]["enabled"]:
         #     x = preprocess.add_border(
         #         x,
