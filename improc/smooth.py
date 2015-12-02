@@ -2,6 +2,7 @@
 __author__ = 'robdefeo'
 import cv2
 
+
 def median_blur(img, ksize=5):
     # ksize – aperture linear size; it must be odd and greater than 1,
     # for example: 3, 5, 7
@@ -15,6 +16,11 @@ def median_blur(img, ksize=5):
     # effectively. Its kernel size should be a positive odd integer.
     return cv2.medianBlur(img, ksize)
 
+
 def gaussian_blur(img, ksize=(5, 5), sigmaX=0):
-    # In this, instead of box filter, gaussian kernel is used. It is done with the function, cv2.GaussianBlur(). We should specify the width and height of kernel which should be positive and odd. We also should specify the standard deviation in X and Y direction, sigmaX and sigmaY respectively. If only sigmaX is specified, sigmaY is taken as same as sigmaX. If both are given as zeros, they are calculated from kernel size. Gaussian blurring is highly effective in removing gaussian noise from the image.
+    # In this, instead of box filter, gaussian kernel is used.
+    # It is done with the function, cv2.GaussianBlur().
+    # We should specify the width and height of kernel which should be positive and odd.
+    # We also should specify the standard deviation in X and Y direction, sigmaX and sigmaY
+    # respectively. If only sigmaX is specified, sigmaY is taken as same as sigmaX. If both are given as zeros, they are calculated from kernel size. Gaussian blurring is highly effective in removing gaussian noise from the image.
     return cv2.GaussianBlur(img, ksize, sigmaX)

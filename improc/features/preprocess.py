@@ -108,13 +108,29 @@ def outline_contour(img):
         return None
 
 
+def outline_contour(img):
+    outline = np.zeros(img.shape, dtype="uint8")
+    (cnts, _) = cv2.findContours(
+        img.copy(), cv2.RETR_EXTERNAL,
+        cv2.CHAIN_APPROX_SIMPLE
+    )
+
+    if len(cnts) > 0:
+        cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[0]
+
+        cv2.drawContours(outline, [cnts], -1, 255, -1)
+
+        return outline
+    else:
+        return None
+
+
 def canny(img, threshold1=100, threshold2=200):
-    # return cv2.Canny(img, threshold1, threshold2)
-    return feature.canny(img, sigma=1, low_threshold=threshold1, high_threshold=threshold2) # sigma = width of the noise
+    return cv2.Canny(img, threshold1, threshold2)
 
 
 def bitwise(img):
-    return np.invert(img)
+    return cv2.bitwise_not(img)
 
 
 def laplacian(img):
@@ -127,12 +143,12 @@ def thresh(img):
     return img
 
 
-def dilate(img, width=5, height=5):
-    # kernel = np.ones((width, height), np.uint8)
-    return morphology.binary_dilation(img)
+def dilate(img, width=5, height=5, iterations=1):
+    kernel = np.ones((width, height), np.uint8)
+    return cv2.dilate(img,kernel,iterations = iterations)
 
 
 def closing(img, width=5, height=5):
-    # kernel = np.ones((width, height), np.uint8)
-    return morphology.binary_closing(img)
+    kernel = np.ones((width, height), np.uint8)
+    return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
