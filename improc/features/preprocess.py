@@ -43,7 +43,7 @@ def make_square(img):
 
 
 def grey(img):
-    return rgb2gray(img)
+    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
 def autocrop(img):
@@ -94,22 +94,6 @@ def add_border(img, color_value=255, width=250, height=250, border_size=15, fill
 
 def outline_contour(img):
     outline = np.zeros(img.shape, dtype="uint8")
-    contours = measure.find_contours(img.copy(), 0.8)
-
-    if len(outline) > 0:
-        for n, contour in enumerate(contours):
-            print outline.shape
-            print contours[n].shape
-            outline = outline + contours[n]
-
-        return outline
-
-    else:
-        return None
-
-
-def outline_contour(img):
-    outline = np.zeros(img.shape, dtype="uint8")
     (_, cnts, _) = cv2.findContours(
         img.copy(), cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
@@ -136,7 +120,7 @@ def bitwise(img):
 
 def laplacian(img):
     # edge detection
-    return cv2.Laplacian(img,cv2.CV_64F)
+    return cv2.Laplacian(img, cv2.CV_64F)
 
 
 def thresh(img):
@@ -146,7 +130,7 @@ def thresh(img):
 
 def dilate(img, width=5, height=5, iterations=1):
     kernel = np.ones((width, height), np.uint8)
-    return cv2.dilate(img,kernel,iterations = iterations)
+    return cv2.dilate(img, kernel, iterations=iterations)
 
 
 def closing(img, width=5, height=5):
